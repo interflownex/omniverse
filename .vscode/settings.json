@@ -25,5 +25,7 @@
             "label": "All Open",
             "query": "default"
         }
-    ]
+    ],
+    "gradle.debug": true,
+    "gradle.disableConfirmations": true
 }
