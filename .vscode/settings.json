@@ -1,3 +1,29 @@
 {
-    "extension.prophet.sitecontext.selectedSiteID": ""
+    "extension.prophet.sitecontext.selectedSiteID": "",
+    "githubPullRequests.queries": [
+        {
+            "label": "Atribuído a Mim",
+            "query": "repo:${owner}/${repository} is:open assignee:${user}"
+        },
+        {
+            "label": "Copilot em Meu Nome",
+            "query": "repo:${owner}/${repository} is:open author:copilot assignee:${user}"
+        },
+        {
+            "label": "Local Pull Request Branches",
+            "query": "default"
+        },
+        {
+            "label": "Aguardando Minha Análise",
+            "query": "repo:${owner}/${repository} is:open review-requested:${user}"
+        },
+        {
+            "label": "Criado Por Mim",
+            "query": "repo:${owner}/${repository} is:open author:${user}"
+        },
+        {
+            "label": "All Open",
+            "query": "default"
+        }
+    ]
 }
