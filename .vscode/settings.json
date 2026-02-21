@@ -27,5 +27,6 @@
         }
     ],
     "gradle.debug": true,
-    "gradle.disableConfirmations": true
+    "gradle.disableConfirmations": true,
+    "rsp-ui.rsp.java.home": ""
 }
