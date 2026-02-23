@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEXORA Downloads</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <style>
+    .list a { display:block; margin:8px 0; color:var(--nx-primary-300); text-decoration:none; }
+    .warn { color:#ffd38a; }
+    code{background:rgba(0,0,0,.3);padding:2px 6px;border-radius:6px}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand"><div class="badge">X</div><div><div>NEXORA Downloads</div><small>Manuais e mobile package</small></div></div>
+      <nav class="nav-links">
+        <a href="/">Dashboard</a>
+        <a href="/admin">Admin</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>Downloads de Manuais e App Mobile</h1>
+      <p>Links diretos para arquivos de teste e operação.</p>
+    </section>
+
+    <section class="card list" style="margin-top:12px;">
+      <h3 style="margin-top:0">Manuais PDF</h3>
+      <a href="/static/downloads/manual-servidor-local.pdf" target="_blank">Manual Servidor Local (PDF)</a>
+      <a href="/static/downloads/manual-admin.pdf" target="_blank">Manual Admin (PDF)</a>
+      <a href="/static/downloads/manual-usuario.pdf" target="_blank">Manual Usuário (PDF)</a>
+      <a href="/static/downloads/manual-smartphone.pdf" target="_blank">Manual Teste no Smartphone (PDF)</a>
+      <a href="/static/downloads/manuais-nexora.zip" target="_blank">Pacote ZIP com todos os manuais</a>
+    </section>
+
+    <section class="card" style="margin-top:12px;">
+      <h3 style="margin-top:0">APK (auto-conexão)</h3>
+      <p>Configuração do app mobile para auto conexão está em <code>/api/v24.7/mobile/bootstrap</code> e no arquivo:</p>
+      <p><code>apps/mobile/apk/runtime-config.json</code></p>
+      <p class="warn">Se o APK ainda não estiver disponível no servidor, gere-o com <code>scripts/build-apk.ps1</code> e publique em <code>/static/downloads/nexora-mobile.apk</code>.</p>
+      <a href="/static/downloads/nexora-mobile.apk" target="_blank">Download APK (quando publicado)</a>
+    </section>
+  </div>
+</body>
+</html>

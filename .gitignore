@@ -1,0 +1,25 @@
+# Build and runtime
+target/
+runtime/
+data/
+logs/
+tmp/
+
+# Rust
+**/*.rs.bk
+Cargo.lock
+
+# Node / web
+node_modules/
+dist/
+build/
+.expo/
+
+# IDE
+.idea/
+.vscode/*.log
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store

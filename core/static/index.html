@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEXORA v24.7</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="badge">X</div>
+        <div>
+          <div>NEXORA</div>
+          <small>v24.7 GLOBAL + NANO</small>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a href="#dashboard">Dashboard</a>
+        <a href="#modules">Módulos</a>
+        <a href="/infographic">Infográfico Online</a>
+        <a href="/investors">Investidores</a>
+      </nav>
+    </header>
+
+    <section id="dashboard" class="hero">
+      <h1 id="heroTitle">Centro de Operações NEXORA</h1>
+      <p id="heroText">Arquitetura global pronta para escala, mantendo perfil local ultraleve para validação e testes.</p>
+      <div class="kpi-grid" id="kpiGrid">
+        <article class="card"><div class="label">Open Requests</div><div class="value" id="kpiOpen">-</div><div class="meta">p95 leitura <= 250ms</div></article>
+        <article class="card"><div class="label">Notificações Não Lidas</div><div class="value" id="kpiNotif">-</div><div class="meta">Watch sync global</div></article>
+        <article class="card"><div class="label">Total Faturado</div><div class="value" id="kpiRevenue">-</div><div class="meta">Billing sandbox ativo</div></article>
+        <article class="card"><div class="label">Região de Escrita</div><div class="value" id="kpiRegion">-</div><div class="meta">Failover automático</div></article>
+      </div>
+    </section>
+
+    <h2 class="section-title" id="modules">Módulos de Serviço e Rentabilidade</h2>
+    <section class="module-grid" id="moduleGrid"></section>
+
+    <h2 class="section-title">Experiência Multi-dispositivo</h2>
+    <section class="dual">
+      <article class="card">
+        <div class="pill">Web + Mobile</div>
+        <h3>Fluxos completos para operação e cliente</h3>
+        <p>Solicitações, notificações, faturamento e analytics com internacionalização pt-BR, en-US e es-ES.</p>
+        <ul>
+          <li>Tempo real para fila operacional</li>
+          <li>Abertura guiada de solicitações</li>
+          <li>Painel administrativo com RBAC</li>
+        </ul>
+      </article>
+      <article class="card">
+        <div class="pill">Smartwatch</div>
+        <h3>Ações críticas instantâneas</h3>
+        <p>Alertas de severidade crítica com comandos rápidos.</p>
+        <ul>
+          <li>ACK imediato</li>
+          <li>Escalar incidente</li>
+          <li>Soneca de 10 minutos</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="hero" style="margin-top:16px;">
+      <h2 style="margin:0; font-family:'Orbitron',sans-serif;">Credenciais de teste local</h2>
+      <p style="margin:0">Admin: <b>admin@nexora.local / admin247</b> | Analyst: <b>analyst@nexora.local / analyst247</b> | Operator: <b>operator@nexora.local / operator247</b></p>
+    </section>
+
+    <footer class="footer">
+      NEXORA v24.7 | API `/api/v24.7` | Header obrigatório: `x-api-version`, `x-region`, `x-tenant`
+    </footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "title": "NEXORA Global Overview",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Open Requests",
+      "targets": [{"expr": "nexora_open_requests"}]
+    },
+    {
+      "type": "stat",
+      "title": "Active Sessions",
+      "targets": [{"expr": "nexora_active_sessions"}]
+    }
+  ],
+  "schemaVersion": 39,
+  "version": 1
+}

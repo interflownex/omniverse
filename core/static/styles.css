@@ -1,0 +1,192 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&family=Orbitron:wght@500;700;800&display=swap');
+
+:root {
+  --nx-bg-900: #040B1A;
+  --nx-bg-700: #0A1D44;
+  --nx-primary-500: #00C8FF;
+  --nx-primary-300: #72E6FF;
+  --nx-accent-500: #A8FF2B;
+  --nx-accent-300: #D6FF86;
+  --nx-text-100: #EAF6FF;
+  --nx-text-300: #AFC7E8;
+  --nx-danger-500: #FF5A6F;
+  --nx-card: rgba(8, 20, 56, 0.8);
+  --nx-border: rgba(114, 230, 255, 0.35);
+  --nx-glow: 0 0 40px rgba(0, 200, 255, 0.2);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  color: var(--nx-text-100);
+  font-family: 'Exo 2', sans-serif;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(0, 200, 255, 0.35), transparent 45%),
+    radial-gradient(circle at 80% 20%, rgba(168, 255, 43, 0.20), transparent 35%),
+    radial-gradient(circle at 50% 100%, rgba(64, 87, 255, 0.2), transparent 40%),
+    linear-gradient(160deg, #040B1A 0%, #08173A 55%, #040B1A 100%);
+  min-height: 100vh;
+}
+
+.shell {
+  width: min(1280px, 94vw);
+  margin: 0 auto;
+  padding: 24px 0 40px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  background: rgba(6, 16, 48, 0.7);
+  border: 1px solid var(--nx-border);
+  border-radius: 18px;
+  box-shadow: var(--nx-glow);
+  backdrop-filter: blur(8px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+}
+
+.brand .badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--nx-primary-500), #5b76ff);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: #02152f;
+}
+
+.nav-links {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  color: var(--nx-text-100);
+  text-decoration: none;
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(114, 230, 255, 0.2);
+  background: rgba(8, 20, 56, 0.65);
+}
+
+.hero {
+  margin-top: 18px;
+  padding: 24px;
+  border-radius: 24px;
+  border: 1px solid var(--nx-border);
+  background: linear-gradient(125deg, rgba(5, 15, 45, 0.86), rgba(13, 35, 88, 0.72));
+  box-shadow: var(--nx-glow);
+  display: grid;
+  gap: 18px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.35rem, 2.7vw, 2.3rem);
+}
+
+.hero p { margin: 0; color: var(--nx-text-300); }
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.card {
+  border: 1px solid var(--nx-border);
+  border-radius: 16px;
+  padding: 14px;
+  background: var(--nx-card);
+  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.2);
+}
+
+.card .label {
+  color: var(--nx-text-300);
+  font-size: 0.85rem;
+}
+
+.card .value {
+  margin-top: 6px;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.card .meta {
+  margin-top: 4px;
+  font-size: 0.82rem;
+  color: var(--nx-accent-300);
+}
+
+.section-title {
+  margin: 24px 0 10px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.05rem;
+  letter-spacing: 0.6px;
+}
+
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.module-card {
+  border: 1px solid rgba(114, 230, 255, 0.3);
+  border-radius: 16px;
+  padding: 14px;
+  background: linear-gradient(155deg, rgba(8, 20, 56, 0.86), rgba(11, 32, 74, 0.66));
+}
+
+.module-card h3 { margin: 0; font-size: 1.05rem; }
+.module-card p { margin: 8px 0; color: var(--nx-text-300); font-size: 0.92rem; }
+.module-card .profit { color: var(--nx-accent-300); font-weight: 600; }
+
+.dual {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 12px;
+}
+
+.pill {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(168, 255, 43, 0.35);
+  color: var(--nx-accent-300);
+  font-size: 0.78rem;
+}
+
+.footer {
+  margin-top: 20px;
+  color: var(--nx-text-300);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 1000px) {
+  .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .module-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dual { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .shell { width: 94vw; }
+  .topbar { flex-direction: column; align-items: flex-start; }
+  .kpi-grid { grid-template-columns: 1fr; }
+  .module-grid { grid-template-columns: 1fr; }
+}

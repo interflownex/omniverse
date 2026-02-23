@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEXORA Admin Console</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <style>
+    .grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    .controls { display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:10px; }
+    .btn { background:linear-gradient(135deg,var(--nx-primary-500),#4b7bff); color:#04162d; font-weight:700; border:none; border-radius:10px; padding:10px 12px; cursor:pointer; }
+    .btn.secondary { background:rgba(8,20,56,.8); color:var(--nx-text-100); border:1px solid var(--nx-border); }
+    .out { white-space:pre-wrap; font-family:Consolas,monospace; font-size:.82rem; background:rgba(0,0,0,.25); border:1px solid rgba(114,230,255,.25); border-radius:12px; padding:10px; min-height:220px; }
+    input { width:100%; padding:10px; border-radius:10px; border:1px solid var(--nx-border); background:rgba(8,20,56,.75); color:var(--nx-text-100); }
+    @media(max-width:900px){ .grid,.controls{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand"><div class="badge">X</div><div><div>NEXORA Admin Console</div><small>Operação local sem PowerShell</small></div></div>
+      <nav class="nav-links">
+        <a href="/">Dashboard</a>
+        <a href="/downloads">Downloads</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>Painel de Ativação Local e Roteamento Externo</h1>
+      <p>Ative host externo, gere usuários de teste e execute validações usando apenas botões no navegador.</p>
+    </section>
+
+    <section class="grid" style="margin-top:12px;">
+      <article class="card">
+        <h3 style="margin-top:0">Login Admin</h3>
+        <label>Email</label>
+        <input id="email" value="admin@nexora.local" />
+        <label style="margin-top:8px;display:block">Senha</label>
+        <input id="password" type="password" value="admin247" />
+        <button class="btn" style="margin-top:10px" onclick="login()">Conectar</button>
+        <div id="authState" class="meta" style="margin-top:8px">Não autenticado</div>
+
+        <h3>Status Atual</h3>
+        <div id="statusBox" class="out">Aguardando consulta...</div>
+        <button class="btn secondary" onclick="refreshStatus()">Atualizar Status</button>
+      </article>
+
+      <article class="card">
+        <h3 style="margin-top:0">Ações One-Click</h3>
+        <div class="controls">
+          <button class="btn" onclick="runAction('publish-remote')">Ativar Host Externo</button>
+          <button class="btn secondary" onclick="runAction('unpublish-remote')">Desativar Host Externo</button>
+          <button class="btn" onclick="runAction('create-tester')">Criar Usuário de Teste</button>
+          <button class="btn secondary" onclick="runAction('revoke-tester')">Revogar Usuário de Teste</button>
+          <button class="btn" onclick="runAction('healthcheck')">Rodar Healthcheck</button>
+          <button class="btn secondary" onclick="runAction('validate-internet')">Validar Internet Host</button>
+        </div>
+
+        <h3>Saída da operação</h3>
+        <div id="output" class="out">Nenhuma ação executada.</div>
+      </article>
+    </section>
+
+    <section class="card" style="margin-top:12px;">
+      <h3 style="margin-top:0">Downloads Diretos</h3>
+      <div class="nav-links">
+        <a href="/static/downloads/manual-servidor-local.pdf" target="_blank">Manual Servidor (PDF)</a>
+        <a href="/static/downloads/manual-admin.pdf" target="_blank">Manual Admin (PDF)</a>
+        <a href="/static/downloads/manual-usuario.pdf" target="_blank">Manual Usuário (PDF)</a>
+        <a href="/static/downloads/manual-smartphone.pdf" target="_blank">Manual Smartphone (PDF)</a>
+        <a href="/static/downloads/manuais-nexora.zip" target="_blank">ZIP de Manuais</a>
+        <a href="/static/downloads/nexora-mobile.apk" target="_blank">APK Mobile</a>
+        <a href="/static/downloads/nexora-smartwatch.apk" target="_blank">APK Smartwatch</a>
+      </div>
+      <p class="meta" style="margin-top:8px;">A auto-conexão do app usa o bootstrap <code>/api/v24.7/mobile/bootstrap</code> (Persona habilitada).</p>
+    </section>
+  </div>
+
+  <script>
+    let token = null;
+
+    async function login() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      try {
+        const r = await fetch('/api/v24.7/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || 'Falha de autenticação');
+        token = data.access_token;
+        document.getElementById('authState').textContent = `Conectado como ${data.user.email}`;
+        await refreshStatus();
+      } catch (e) {
+        document.getElementById('authState').textContent = `Erro: ${e.message}`;
+      }
+    }
+
+    async function refreshStatus() {
+      if (!token) return;
+      const r = await fetch('/api/v24.7/admin/status', { headers: { Authorization: `Bearer ${token}` } });
+      const data = await r.json();
+      document.getElementById('statusBox').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function runAction(action) {
+      if (!token) {
+        document.getElementById('output').textContent = 'Faça login admin primeiro.';
+        return;
+      }
+      document.getElementById('output').textContent = `Executando ${action}...`;
+      try {
+        const r = await fetch(`/api/v24.7/admin/${action}`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await r.json();
+        document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+        await refreshStatus();
+      } catch (e) {
+        document.getElementById('output').textContent = `Erro: ${e.message}`;
+      }
+    }
+  </script>
+</body>
+</html>

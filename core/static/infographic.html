@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Infográfico NEXORA</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <style>
+    .inf-wrap { display:grid; gap:12px; }
+    .timeline { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:10px; }
+    .tblock { border:1px solid var(--nx-border); border-radius:14px; padding:12px; background: rgba(8,20,56,.75); }
+    .bubble { width:10px; height:10px; border-radius:50%; background: var(--nx-accent-500); box-shadow:0 0 10px var(--nx-accent-500); display:inline-block; margin-right:6px; }
+    table { width:100%; border-collapse: collapse; }
+    th,td { text-align:left; padding:10px; border-bottom:1px solid rgba(114,230,255,.2); }
+    .up { color: var(--nx-accent-300); font-weight:600; }
+    @media (max-width:900px){ .timeline{grid-template-columns:1fr 1fr;} }
+    @media (max-width:600px){ .timeline{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+  <div class="shell inf-wrap">
+    <header class="topbar">
+      <div class="brand"><div class="badge">X</div><div><div>Infográfico NEXORA</div><small>Funcionalidades, Módulos, Serviços e Rentabilidade</small></div></div>
+      <nav class="nav-links">
+        <a href="/">Dashboard</a>
+        <a href="/investors">Portal de Investidores</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>Mapa de Valor do Sistema NEXORA v24.7</h1>
+      <p>Visão consolidada de funcionalidades, serviços e projeções de rentabilidade por módulo para operação e investimento.</p>
+    </section>
+
+    <section class="timeline">
+      <article class="tblock"><span class="bubble"></span><b>IAM + RBAC</b><p>Controle de acesso multinível e trilha imutável.</p></article>
+      <article class="tblock"><span class="bubble"></span><b>Workflow</b><p>Gestão de solicitações, SLA e escalonamento global.</p></article>
+      <article class="tblock"><span class="bubble"></span><b>Billing</b><p>Faturamento com previsibilidade e conciliação.</p></article>
+      <article class="tblock"><span class="bubble"></span><b>Analytics</b><p>Métricas por tenant, região e canal.</p></article>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0;font-family:'Orbitron',sans-serif;">Rentabilidade Projetada por Módulo</h2>
+      <table>
+        <thead>
+          <tr><th>Módulo</th><th>Serviço-chave</th><th>Impacto Financeiro</th><th>Projeção</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Auth/IAM</td><td>Redução de fraude + auditoria</td><td>Redução de perdas</td><td class="up">+18% margem líquida</td></tr>
+          <tr><td>Users/PF-PJ</td><td>Onboarding completo</td><td>Menor churn inicial</td><td class="up">+12% retenção</td></tr>
+          <tr><td>Catalog</td><td>Pacotes de serviço versionados</td><td>Upsell contínuo</td><td class="up">+20% MRR</td></tr>
+          <tr><td>Workflow</td><td>Automação de atendimento</td><td>Produtividade operacional</td><td class="up">-30% custo OPEX</td></tr>
+          <tr><td>Notify + Watch</td><td>Ações críticas em segundos</td><td>Menos incidentes caros</td><td class="up">+15% eficiência</td></tr>
+          <tr><td>Billing</td><td>Receita recorrente rastreável</td><td>Previsibilidade</td><td class="up">+22% caixa recorrente</td></tr>
+          <tr><td>Analytics</td><td>Decisão por KPI global</td><td>Otimização contínua</td><td class="up">+14% margem operacional</td></tr>
+          <tr><td>Config Tenant</td><td>Expansão internacional</td><td>Novos mercados</td><td class="up">+17% crescimento anual</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="hero">
+      <h2 style="margin:0;font-family:'Orbitron',sans-serif;">Link para Investidores</h2>
+      <p style="margin:0">Acesse o portal dedicado com tese de crescimento, tese de risco e metas por horizonte:</p>
+      <div><a href="/investors" class="pill">Abrir Portal de Investidores</a></div>
+    </section>
+  </div>
+</body>
+</html>

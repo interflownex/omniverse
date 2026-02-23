@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nexora-core
+  namespace: nexora
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nexora-core
+  template:
+    metadata:
+      labels:
+        app: nexora-core
+    spec:
+      containers:
+        - name: nexora-core
+          image: ghcr.io/interflownex/nexora-core:24.7.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: NEXORA_REGION
+              value: us-east
+            - name: NEXORA_TENANT
+              value: tenant-nexora-default
+            - name: RUST_LOG
+              value: info
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20

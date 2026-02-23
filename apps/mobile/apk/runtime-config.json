@@ -1,0 +1,8 @@
+{
+  "assistant": "Persona",
+  "bootstrapEndpoint": "/api/v24.7/mobile/bootstrap",
+  "preferredBaseUrl": "https://nexora.interflownex.com",
+  "fallbackMode": "auto",
+  "autoReconnect": true,
+  "notes": "When external host is active, app reconnects without manual URL input."
+}

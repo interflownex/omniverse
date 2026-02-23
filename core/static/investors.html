@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEXORA Investidores</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <style>
+    .grid2{display:grid;grid-template-columns:1.2fr 1fr;gap:12px}
+    .metric{font-size:1.8rem;font-weight:700;margin-top:8px}
+    .risk{border-left:3px solid var(--nx-danger-500);padding-left:10px;color:var(--nx-text-300)}
+    @media(max-width:920px){.grid2{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand"><div class="badge">X</div><div><div>NEXORA Investor Hub</div><small>Estratégia de crescimento global</small></div></div>
+      <nav class="nav-links">
+        <a href="/">Operações</a>
+        <a href="/infographic">Infográfico</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>Resumo Executivo para Investidores</h1>
+      <p>NEXORA v24.7 combina operação local enxuta e arquitetura global escalável com modelo de receita modular.</p>
+    </section>
+
+    <section class="grid2" style="margin-top:12px;">
+      <article class="card">
+        <h2 style="margin-top:0;font-family:'Orbitron',sans-serif;">KPIs de expansão</h2>
+        <div class="metric">10.000 req/s</div>
+        <div class="meta">Capacidade alvo global inicial</div>
+        <div class="metric">1.000.000 tenants</div>
+        <div class="meta">Escalabilidade lógica por shard tenant/região</div>
+        <div class="metric">RTO 15 min / RPO 5 min</div>
+        <div class="meta">Resiliência multi-região</div>
+      </article>
+      <article class="card">
+        <h2 style="margin-top:0;font-family:'Orbitron',sans-serif;">Link de teste remoto</h2>
+        <p>Após execução do script de publicação, o link fica disponível para testes externos.</p>
+        <code style="display:block; padding:10px; background:rgba(0,0,0,.3); border-radius:8px;">runtime/remote/public-url.txt</code>
+        <p style="margin-bottom:0;">Scripts: `publish-remote.ps1`, `remote-test-pack.ps1`</p>
+      </article>
+    </section>
+
+    <section class="card" style="margin-top:12px;">
+      <h2 style="margin-top:0;font-family:'Orbitron',sans-serif;">Tese de rentabilidade (3 anos)</h2>
+      <ul>
+        <li>Ano 1: foco em eficiência operacional com margem projetada de +15%.</li>
+        <li>Ano 2: expansão regional com crescimento de receita recorrente de +28%.</li>
+        <li>Ano 3: monetização avançada por analytics e serviços premium com +35% de ARR.</li>
+      </ul>
+      <p class="risk"><b>Riscos monitorados:</b> latência inter-região, compliance local e custo de aquisição; mitigação via roteamento por residência de dados, observabilidade federada e pricing por uso.</p>
+    </section>
+  </div>
+</body>
+</html>

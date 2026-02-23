@@ -1,0 +1,16 @@
+:root {
+  --nx-bg-900: #040B1A;
+  --nx-bg-700: #0A1D44;
+  --nx-primary-500: #00C8FF;
+  --nx-primary-300: #72E6FF;
+  --nx-accent-500: #A8FF2B;
+  --nx-accent-300: #D6FF86;
+  --nx-text-100: #EAF6FF;
+  --nx-text-300: #AFC7E8;
+  --nx-danger-500: #FF5A6F;
+  --nx-success-500: #32D98A;
+  --nx-radius-sm: 6px;
+  --nx-radius-md: 12px;
+  --nx-radius-lg: 20px;
+  --nx-shadow-glow: 0 0 24px rgba(0, 200, 255, 0.35);
+}

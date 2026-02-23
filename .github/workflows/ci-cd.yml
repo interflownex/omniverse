@@ -1,0 +1,31 @@
+name: nexora-ci-cd
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Format check
+        run: cargo fmt --manifest-path core/Cargo.toml --all -- --check
+      - name: Lint
+        run: cargo clippy --manifest-path core/Cargo.toml -- -D warnings
+      - name: Test
+        run: cargo test --manifest-path core/Cargo.toml
+
+  cd:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: ci
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: echo "Build/push image step placeholder for ghcr.io/interflownex/nexora-core:24.7.0"
+      - name: Deploy canary
+        run: echo "Deploy 5% -> 25% -> 100% with rollback on SLO breach"
