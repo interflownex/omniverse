@@ -28,5 +28,7 @@
     ],
     "gradle.debug": true,
     "gradle.disableConfirmations": true,
-    "rsp-ui.rsp.java.home": ""
+    "rsp-ui.rsp.java.home": "",
+    "chatgpt.openOnStartup": true,
+    "chatgpt.commentCodeLensEnabled": true
 }
