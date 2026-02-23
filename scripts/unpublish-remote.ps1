@@ -4,10 +4,10 @@ $pidFile = Join-Path $root 'runtime\\remote\\cloudflared.pid'
 $urlFile = Join-Path $root 'runtime\\remote\\public-url.txt'
 
 if (Test-Path $pidFile) {
-  $pid = Get-Content $pidFile | Select-Object -First 1
-  if ($pid) {
-    $proc = Get-Process -Id $pid -ErrorAction SilentlyContinue
-    if ($proc) { Stop-Process -Id $pid -Force }
+  $targetPid = (Get-Content $pidFile | Select-Object -First 1).ToString().Trim()
+  if ($targetPid -match '^\d+$') {
+    $proc = Get-Process -Id $targetPid -ErrorAction SilentlyContinue
+    if ($proc) { Stop-Process -Id $targetPid -Force }
   }
   Remove-Item $pidFile -Force -ErrorAction SilentlyContinue
 }
