@@ -4,4 +4,4 @@ metadata:
   name: nexora
   labels:
     app.kubernetes.io/name: nexora
-    app.kubernetes.io/version: "24.7"
+    app.kubernetes.io/version: "24.8"

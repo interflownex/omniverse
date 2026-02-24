@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: nexora-core
-          image: ghcr.io/interflownex/nexora-core:24.7.0
+          image: ghcr.io/interflownex/nexora-core:24.8.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080

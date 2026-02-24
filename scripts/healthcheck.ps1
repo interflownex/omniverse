@@ -18,7 +18,7 @@ $results += Test-Endpoint 'health' 'GET' 'http://127.0.0.1:8080/health'
 
 $login = $null
 try {
-  $login = Invoke-RestMethod -Method POST -Uri 'http://127.0.0.1:8080/api/v24.7/auth/login' -Body (@{email='admin@nexora.local';password='admin247'} | ConvertTo-Json) -ContentType 'application/json'
+  $login = Invoke-RestMethod -Method POST -Uri 'http://127.0.0.1:8080/api/v24.8/auth/login' -Body (@{email='admin@nexora.local';password='admin247'} | ConvertTo-Json) -ContentType 'application/json'
   $results += [pscustomobject]@{ Endpoint = 'auth/login'; Status = 'OK'; Detail = 'token issued' }
 } catch {
   $results += [pscustomobject]@{ Endpoint = 'auth/login'; Status = 'FAIL'; Detail = $_.Exception.Message }
@@ -26,11 +26,11 @@ try {
 
 $headers = @{}
 if ($login) { $headers.Authorization = "Bearer $($login.access_token)" }
-$results += Test-Endpoint 'modules' 'GET' 'http://127.0.0.1:8080/api/v24.7/modules' $headers
-$results += Test-Endpoint 'analytics' 'GET' 'http://127.0.0.1:8080/api/v24.7/analytics/overview' $headers
-$results += Test-Endpoint 'platform/regions' 'GET' 'http://127.0.0.1:8080/api/v24.7/platform/regions'
-$results += Test-Endpoint 'platform/routing' 'GET' 'http://127.0.0.1:8080/api/v24.7/platform/routing'
-$results += Test-Endpoint 'platform/replication-status' 'GET' 'http://127.0.0.1:8080/api/v24.7/platform/replication-status'
+$results += Test-Endpoint 'modules' 'GET' 'http://127.0.0.1:8080/api/v24.8/modules' $headers
+$results += Test-Endpoint 'analytics' 'GET' 'http://127.0.0.1:8080/api/v24.8/analytics/overview' $headers
+$results += Test-Endpoint 'platform/regions' 'GET' 'http://127.0.0.1:8080/api/v24.8/platform/regions'
+$results += Test-Endpoint 'platform/routing' 'GET' 'http://127.0.0.1:8080/api/v24.8/platform/routing'
+$results += Test-Endpoint 'platform/replication-status' 'GET' 'http://127.0.0.1:8080/api/v24.8/platform/replication-status'
 
 $results | Format-Table -AutoSize
 if ($results.Status -contains 'FAIL') { exit 1 }

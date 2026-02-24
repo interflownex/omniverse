@@ -26,6 +26,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build image
-        run: echo "Build/push image step placeholder for ghcr.io/interflownex/nexora-core:24.7.0"
+        run: echo "Build/push image step placeholder for ghcr.io/interflownex/nexora-core:24.8.0"
       - name: Deploy canary
         run: echo "Deploy 5% -> 25% -> 100% with rollback on SLO breach"

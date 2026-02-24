@@ -1,5 +1,5 @@
 INSERT OR IGNORE INTO schema_release (id, version, checksum) VALUES
-('schema-24.7.0', '24.7.0', 'nexora-v24.7-baseline');
+('schema-24.8.0', '24.8.0', 'nexora-v24.8-baseline');
 
 INSERT OR IGNORE INTO geo_region (code, name) VALUES
 ('us-east', 'United States East'),
@@ -8,6 +8,7 @@ INSERT OR IGNORE INTO geo_region (code, name) VALUES
 
 INSERT OR IGNORE INTO role (id, code, name) VALUES
 ('role-admin', 'admin', 'Administrator'),
+('role-user', 'user', 'User'),
 ('role-analyst', 'analyst', 'Analyst'),
 ('role-operator', 'operator', 'Operator'),
 ('role-tester', 'tester', 'Remote Tester');
@@ -27,6 +28,7 @@ INSERT OR IGNORE INTO role_permission (id, role_code, permission_code) VALUES
 ('rp-6', 'analyst', 'service_request.manage'),
 ('rp-7', 'operator', 'service_request.create'),
 ('rp-8', 'operator', 'notification.ack'),
+('rp-10', 'user', 'service_request.create'),
 ('rp-9', 'tester', 'service_request.create');
 
 INSERT OR IGNORE INTO metric_definition (id, code, name, description, aggregation_rule) VALUES

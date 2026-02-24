@@ -15,7 +15,7 @@ function currency(v) {
 }
 
 async function loadOverview() {
-  const loginResp = await fetch("/api/v24.7/auth/login", {
+  const loginResp = await fetch("/api/v24.8/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email: "admin@nexora.local", password: "admin247" })
@@ -23,12 +23,12 @@ async function loadOverview() {
   const login = await loginResp.json();
   const token = login.access_token;
 
-  const analyticsResp = await fetch("/api/v24.7/analytics/overview", {
+  const analyticsResp = await fetch("/api/v24.8/analytics/overview", {
     headers: { Authorization: `Bearer ${token}` }
   });
   const analytics = await analyticsResp.json();
 
-  const routingResp = await fetch("/api/v24.7/platform/routing");
+  const routingResp = await fetch("/api/v24.8/platform/routing");
   const routing = await routingResp.json();
 
   document.getElementById("kpiOpen").textContent = analytics.open_requests ?? 0;

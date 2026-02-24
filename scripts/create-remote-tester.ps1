@@ -26,10 +26,10 @@ if (-not $BaseUrl) {
 }
 
 try {
-  $login = Invoke-RestMethod -Method POST -Uri "$BaseUrl/api/v24.7/auth/login" -Body (@{email=$AdminEmail;password=$AdminPassword} | ConvertTo-Json) -ContentType 'application/json' -TimeoutSec 20
+  $login = Invoke-RestMethod -Method POST -Uri "$BaseUrl/api/v24.8/auth/login" -Body (@{email=$AdminEmail;password=$AdminPassword} | ConvertTo-Json) -ContentType 'application/json' -TimeoutSec 20
   $headers = @{ Authorization = "Bearer $($login.access_token)" }
 
-  $provision = Invoke-RestMethod -Method POST -Uri "$BaseUrl/api/v24.7/test-access/provision" -Headers $headers -Body (@{email=$TesterEmail;expires_hours=$ExpiresHours} | ConvertTo-Json) -ContentType 'application/json' -TimeoutSec 20
+  $provision = Invoke-RestMethod -Method POST -Uri "$BaseUrl/api/v24.8/test-access/provision" -Headers $headers -Body (@{email=$TesterEmail;expires_hours=$ExpiresHours} | ConvertTo-Json) -ContentType 'application/json' -TimeoutSec 20
 } catch {
   throw "[create-remote-tester] failed to provision tester. Ensure nexora-core is running on $BaseUrl and admin credentials are valid. Details: $($_.Exception.Message)"
 }

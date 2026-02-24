@@ -70,12 +70,12 @@ INSERT OR IGNORE INTO service_catalog (id, code, name, description, enabled) VAL
 
 INSERT OR IGNORE INTO service_catalog_version (id, service_catalog_id, version, spec_json, is_active)
 VALUES
-('sv-1', 'svc-1', '24.7.0', '{"steps":["collect_docs","verify_identity","activate"]}', 1),
-('sv-2', 'svc-2', '24.7.0', '{"steps":["triage","escalate","resolve"]}', 1),
-('sv-3', 'svc-3', '24.7.0', '{"steps":["fetch_invoice","analyze","close"]}', 1);
+('sv-1', 'svc-1', '24.8.0', '{"steps":["collect_docs","verify_identity","activate"]}', 1),
+('sv-2', 'svc-2', '24.8.0', '{"steps":["triage","escalate","resolve"]}', 1),
+('sv-3', 'svc-3', '24.8.0', '{"steps":["fetch_invoice","analyze","close"]}', 1);
 
 INSERT OR IGNORE INTO workflow_definition (id, module_code, name, version)
-VALUES ('wf-1', 'workflow', 'Default Request Workflow', '24.7.0');
+VALUES ('wf-1', 'workflow', 'Default Request Workflow', '24.8.0');
 
 INSERT OR IGNORE INTO workflow_transition (id, workflow_definition_id, from_state, action, to_state) VALUES
 ('wft-1', 'wf-1', 'open', 'start', 'in_progress'),
@@ -104,6 +104,7 @@ VALUES ('tax-1', 'invl-1', 'ISS', 0.05, 150.00);
 INSERT OR IGNORE INTO auth_user (id, tenant_id, party_id, name, email, password_hash, role_code, status)
 VALUES
 ('usr-admin', 'tenant-nexora-default', 'party-pf-admin', 'Admin', 'admin@nexora.local', 'admin247', 'admin', 'active'),
+('usr-user', 'tenant-nexora-default', 'party-pf-operator', 'User', 'user@nexora.local', 'user247', 'user', 'active'),
 ('usr-analyst', 'tenant-nexora-default', 'party-pf-analyst', 'Analyst', 'analyst@nexora.local', 'analyst247', 'analyst', 'active'),
 ('usr-operator', 'tenant-nexora-default', 'party-pf-operator', 'Operator', 'operator@nexora.local', 'operator247', 'operator', 'active');
 
@@ -127,7 +128,7 @@ VALUES
 ('not-2', 'tenant-nexora-default', 'usr-operator', 'in_app', 'high', 'Fatura pendente', 'Fatura inv-1 com vencimento próximo.');
 
 INSERT OR IGNORE INTO consent_term (id, code, version, content)
-VALUES ('cterm-1', 'privacy-policy', '24.7.0', 'Termo de privacidade NEXORA v24.7.0');
+VALUES ('cterm-1', 'privacy-policy', '24.8.0', 'Termo de privacidade NEXORA v24.8.0');
 
 INSERT OR IGNORE INTO consent_grant (id, party_id, consent_term_id)
 VALUES ('cgrant-1', 'party-pf-admin', 'cterm-1');

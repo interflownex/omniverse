@@ -1,13 +1,13 @@
-# NEXORA v24.7
+# NEXORA v24.8
 
-NEXORA v24.7 implements a dual-profile architecture:
+NEXORA v24.8 implements a dual-profile architecture:
 
 - `NANO-LOCAL-13MB`: local test runtime using one Rust process + SQLite databases.
 - `GLOBAL-SCALE`: Kubernetes multi-region topology with GitOps-ready manifests and observability stack.
 
 ## What is included
 
-- Rust API runtime (`core`) exposing `/api/v24.7` endpoints.
+- Rust API runtime (`core`) exposing `/api/v24.8` endpoints.
 - Canonical PF/PJ database model with extensibility (`entity_attribute_*`, `entity_link`).
 - Local scripts for bootstrap, run, healthcheck, reset, uninstall, memory budget, and host internet validation.
 - Remote test publication scripts through Cloudflare Tunnel.
@@ -27,7 +27,7 @@ NEXORA v24.7 implements a dual-profile architecture:
 
 All responses include:
 
-- `x-api-version: 24.7`
+- `x-api-version: 24.8`
 - `x-region: <region_code>`
 - `x-tenant: <tenant_id>`
 

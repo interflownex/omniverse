@@ -75,13 +75,16 @@ struct RevokeTesterInput { email: Option<String> }
 #[derive(Deserialize)]
 struct PersonaChatInput { message: String }
 
+#[derive(Deserialize)]
+struct PartialToggleInput { codes: Vec<String>, enabled: Option<bool> }
+
 impl AppConfig {
     fn from_env() -> anyhow::Result<Self> {
         let root = env::var("NEXORA_ROOT").map(PathBuf::from).unwrap_or(env::current_dir()?);
         std::fs::create_dir_all(root.join("data"))?;
         let bind_addr = env::var("NEXORA_BIND").unwrap_or_else(|_| "127.0.0.1:8080".to_string()).parse::<SocketAddr>()?;
         Ok(Self {
-            api_version: "24.7".to_string(),
+            api_version: "24.8".to_string(),
             region: env::var("NEXORA_REGION").unwrap_or_else(|_| "sa-east".to_string()),
             default_tenant: env::var("NEXORA_TENANT").unwrap_or_else(|_| "tenant-nexora-default".to_string()),
             bind_addr,
@@ -107,34 +110,41 @@ async fn main() -> anyhow::Result<()> {
         .route("/", get(index))
         .route("/health", get(health))
         .route("/metrics", get(metrics))
-        .route("/api/v24.7/openapi", get(openapi))
-        .route("/api/v24.7/auth/login", post(login))
-        .route("/api/v24.7/auth/refresh", post(refresh))
-        .route("/api/v24.7/users/me", get(users_me))
-        .route("/api/v24.7/modules", get(modules))
-        .route("/api/v24.7/service-requests", post(create_service_request))
-        .route("/api/v24.7/service-requests/:id", get(get_service_request))
-        .route("/api/v24.7/service-requests/:id/actions", post(service_request_action))
-        .route("/api/v24.7/notifications", get(list_notifications))
-        .route("/api/v24.7/notifications/:id/ack", post(ack_notification))
-        .route("/api/v24.7/analytics/overview", get(analytics_overview))
-        .route("/api/v24.7/platform/regions", get(platform_regions))
-        .route("/api/v24.7/platform/routing", get(platform_routing))
-        .route("/api/v24.7/platform/replication-status", get(platform_replication_status))
-        .route("/api/v24.7/platform/failover/simulate", post(platform_failover_simulate))
-        .route("/api/v24.7/test-access/provision", post(provision_remote_tester))
-        .route("/api/v24.7/test-access/revoke", post(revoke_remote_tester))
-        .route("/api/v24.7/test-access/status", get(remote_test_status))
-        .route("/api/v24.7/persona/status", get(persona_status))
-        .route("/api/v24.7/persona/chat", post(persona_chat))
-        .route("/api/v24.7/mobile/bootstrap", get(mobile_bootstrap))
-        .route("/api/v24.7/admin/status", get(admin_status))
-        .route("/api/v24.7/admin/publish-remote", post(admin_publish_remote))
-        .route("/api/v24.7/admin/unpublish-remote", post(admin_unpublish_remote))
-        .route("/api/v24.7/admin/create-tester", post(admin_create_tester))
-        .route("/api/v24.7/admin/revoke-tester", post(admin_revoke_tester))
-        .route("/api/v24.7/admin/healthcheck", post(admin_healthcheck))
-        .route("/api/v24.7/admin/validate-internet", post(admin_validate_internet))
+        .route("/api/v24.8/openapi", get(openapi))
+        .route("/api/v24.8/auth/login", post(login))
+        .route("/api/v24.8/auth/refresh", post(refresh))
+        .route("/api/v24.8/users/me", get(users_me))
+        .route("/api/v24.8/modules", get(modules))
+        .route("/api/v24.8/service-requests", post(create_service_request))
+        .route("/api/v24.8/service-requests/:id", get(get_service_request))
+        .route("/api/v24.8/service-requests/:id/actions", post(service_request_action))
+        .route("/api/v24.8/notifications", get(list_notifications))
+        .route("/api/v24.8/notifications/:id/ack", post(ack_notification))
+        .route("/api/v24.8/analytics/overview", get(analytics_overview))
+        .route("/api/v24.8/platform/regions", get(platform_regions))
+        .route("/api/v24.8/platform/routing", get(platform_routing))
+        .route("/api/v24.8/platform/replication-status", get(platform_replication_status))
+        .route("/api/v24.8/platform/failover/simulate", post(platform_failover_simulate))
+        .route("/api/v24.8/test-access/provision", post(provision_remote_tester))
+        .route("/api/v24.8/test-access/revoke", post(revoke_remote_tester))
+        .route("/api/v24.8/test-access/status", get(remote_test_status))
+        .route("/api/v24.8/persona/status", get(persona_status))
+        .route("/api/v24.8/persona/chat", post(persona_chat))
+        .route("/api/v24.8/mobile/bootstrap", get(mobile_bootstrap))
+        .route("/api/v24.8/admin/status", get(admin_status))
+        .route("/api/v24.8/admin/publish-remote", post(admin_publish_remote))
+        .route("/api/v24.8/admin/unpublish-remote", post(admin_unpublish_remote))
+        .route("/api/v24.8/admin/create-tester", post(admin_create_tester))
+        .route("/api/v24.8/admin/revoke-tester", post(admin_revoke_tester))
+        .route("/api/v24.8/admin/healthcheck", post(admin_healthcheck))
+        .route("/api/v24.8/admin/validate-internet", post(admin_validate_internet))
+        .route("/api/v24.8/admin/reconfigure-zero", post(admin_reconfigure_zero))
+        .route("/api/v24.8/admin/server/start", post(admin_server_start))
+        .route("/api/v24.8/admin/server/stop", post(admin_server_stop))
+        .route("/api/v24.8/admin/modules/activate-all", post(admin_modules_activate_all))
+        .route("/api/v24.8/admin/modules/activate-partial", post(admin_modules_activate_partial))
+        .route("/api/v24.8/admin/services/activate-all", post(admin_services_activate_all))
+        .route("/api/v24.8/admin/services/activate-partial", post(admin_services_activate_partial))
         .route("/infographic", get(infographic))
         .route("/investors", get(investors))
         .route("/downloads", get(downloads))
@@ -154,7 +164,7 @@ async fn main() -> anyhow::Result<()> {
 async fn response_headers(State(state): State<AppState>, req: Request, next: Next) -> Response {
     let tenant = req.headers().get("x-tenant").and_then(|v| v.to_str().ok()).unwrap_or(&state.config.default_tenant).to_string();
     let mut resp = next.run(req).await;
-    resp.headers_mut().insert("x-api-version", HeaderValue::from_str(&state.config.api_version).unwrap_or(HeaderValue::from_static("24.7")));
+    resp.headers_mut().insert("x-api-version", HeaderValue::from_str(&state.config.api_version).unwrap_or(HeaderValue::from_static("24.8")));
     resp.headers_mut().insert("x-region", HeaderValue::from_str(&state.config.region).unwrap_or(HeaderValue::from_static("sa-east")));
     if let Ok(v) = HeaderValue::from_str(&tenant) { resp.headers_mut().insert("x-tenant", v); }
     resp
@@ -195,6 +205,8 @@ fn init_databases(config: &AppConfig) -> anyhow::Result<()> {
     c.execute_batch(&seeds)?;
     c.execute_batch(&views)?;
     c.execute_batch(&idx)?;
+    c.execute_batch("CREATE TABLE IF NOT EXISTS runtime_control(id INTEGER PRIMARY KEY CHECK (id=1), server_enabled INTEGER NOT NULL DEFAULT 1, updated_at TEXT NOT NULL DEFAULT (datetime('now')));")?;
+    c.execute("INSERT OR IGNORE INTO runtime_control(id, server_enabled, updated_at) VALUES (1,1,datetime('now'))", [])?;
 
     let a = Connection::open(&config.audit_db)?;
     a.execute_batch(&mem)?;
@@ -208,6 +220,19 @@ fn init_databases(config: &AppConfig) -> anyhow::Result<()> {
 
 async fn ensure_static_files(config: &AppConfig) -> anyhow::Result<()> {
     tokio::fs::create_dir_all(&config.static_dir).await?;
+    ensure_apk_artifacts(config)?;
+    Ok(())
+}
+
+fn ensure_apk_artifacts(config: &AppConfig) -> anyhow::Result<()> {
+    let downloads = config.static_dir.join("downloads");
+    std::fs::create_dir_all(&downloads)?;
+    for file in ["nexora-mobile.apk", "nexora-smartwatch.apk"] {
+        let p = downloads.join(file);
+        if !p.exists() {
+            std::fs::write(&p, b"NEXORA APK placeholder for local installation package.")?;
+        }
+    }
     Ok(())
 }
 async fn index(State(state): State<AppState>) -> ApiResult<Html<String>> {
@@ -270,31 +295,31 @@ async fn metrics(State(state): State<AppState>) -> ApiResult<String> {
 async fn openapi() -> Json<Value> {
     Json(json!({
         "openapi": "3.1.0",
-        "info": {"title": "NEXORA API", "version": "24.7"},
+        "info": {"title": "NEXORA API", "version": "24.8"},
         "paths": {
-            "/api/v24.7/auth/login": {"post": {}},
-            "/api/v24.7/auth/refresh": {"post": {}},
-            "/api/v24.7/users/me": {"get": {}},
-            "/api/v24.7/modules": {"get": {}},
-            "/api/v24.7/service-requests": {"post": {}},
-            "/api/v24.7/notifications": {"get": {}},
-            "/api/v24.7/analytics/overview": {"get": {}},
-            "/api/v24.7/platform/regions": {"get": {}},
-            "/api/v24.7/platform/routing": {"get": {}},
-            "/api/v24.7/platform/replication-status": {"get": {}},
-            "/api/v24.7/platform/failover/simulate": {"post": {}},
-            "/api/v24.7/persona/status": {"get": {}},
-            "/api/v24.7/persona/chat": {"post": {}},
-            "/api/v24.7/mobile/bootstrap": {"get": {}},
-            "/api/v24.7/persona/status": {"get": {}},
-            "/api/v24.7/persona/chat": {"post": {}},
-            "/api/v24.7/admin/status": {"get": {}},
-            "/api/v24.7/admin/publish-remote": {"post": {}},
-            "/api/v24.7/admin/unpublish-remote": {"post": {}},
-            "/api/v24.7/admin/create-tester": {"post": {}},
-            "/api/v24.7/admin/revoke-tester": {"post": {}},
-            "/api/v24.7/admin/healthcheck": {"post": {}},
-            "/api/v24.7/admin/validate-internet": {"post": {}}
+            "/api/v24.8/auth/login": {"post": {}},
+            "/api/v24.8/auth/refresh": {"post": {}},
+            "/api/v24.8/users/me": {"get": {}},
+            "/api/v24.8/modules": {"get": {}},
+            "/api/v24.8/service-requests": {"post": {}},
+            "/api/v24.8/notifications": {"get": {}},
+            "/api/v24.8/analytics/overview": {"get": {}},
+            "/api/v24.8/platform/regions": {"get": {}},
+            "/api/v24.8/platform/routing": {"get": {}},
+            "/api/v24.8/platform/replication-status": {"get": {}},
+            "/api/v24.8/platform/failover/simulate": {"post": {}},
+            "/api/v24.8/persona/status": {"get": {}},
+            "/api/v24.8/persona/chat": {"post": {}},
+            "/api/v24.8/mobile/bootstrap": {"get": {}},
+            "/api/v24.8/persona/status": {"get": {}},
+            "/api/v24.8/persona/chat": {"post": {}},
+            "/api/v24.8/admin/status": {"get": {}},
+            "/api/v24.8/admin/publish-remote": {"post": {}},
+            "/api/v24.8/admin/unpublish-remote": {"post": {}},
+            "/api/v24.8/admin/create-tester": {"post": {}},
+            "/api/v24.8/admin/revoke-tester": {"post": {}},
+            "/api/v24.8/admin/healthcheck": {"post": {}},
+            "/api/v24.8/admin/validate-internet": {"post": {}}
         }
     }))
 }
@@ -638,9 +663,20 @@ fn run_ps_script(state: &AppState, script_name: &str) -> ApiResult<Value> {
 
 async fn admin_status(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<Json<Value>> {
     let _ctx = require_admin(&headers, &state)?;
+    let conn = open_conn(&state)?;
+    let server_enabled: i64 = conn.query_row("SELECT server_enabled FROM runtime_control WHERE id=1", [], |r| r.get(0)).unwrap_or(1);
+    let mut modules_stmt = conn.prepare("SELECT code, enabled FROM system_module ORDER BY code")?;
+    let modules = modules_stmt.query_map([], |r| Ok(json!({"code": r.get::<_, String>(0)?, "enabled": r.get::<_, i64>(1)? == 1})))?
+        .collect::<Result<Vec<_>, _>>()?;
+    let mut services_stmt = conn.prepare("SELECT code, enabled FROM service_catalog ORDER BY code")?;
+    let services = services_stmt.query_map([], |r| Ok(json!({"code": r.get::<_, String>(0)?, "enabled": r.get::<_, i64>(1)? == 1})))?
+        .collect::<Result<Vec<_>, _>>()?;
     let public_url = std::fs::read_to_string(state.config.root_dir.join("runtime/remote/public-url.txt")).ok();
     let tester = std::fs::read_to_string(state.config.root_dir.join("runtime/remote/tester-credentials.txt")).ok();
     Ok(Json(json!({
+        "server_enabled": server_enabled == 1,
+        "modules": modules,
+        "services": services,
         "public_url": public_url.map(|s| s.trim().to_string()),
         "tester_credentials": tester,
         "checked_at": now_sql()
@@ -675,4 +711,75 @@ async fn admin_healthcheck(State(state): State<AppState>, headers: HeaderMap) ->
 async fn admin_validate_internet(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<Json<Value>> {
     let _ctx = require_admin(&headers, &state)?;
     Ok(Json(run_ps_script(&state, "validate-host-internet.ps1")?))
+}
+
+async fn admin_reconfigure_zero(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<Json<Value>> {
+    let _ctx = require_admin(&headers, &state)?;
+    let data_dir = state.config.root_dir.join("data");
+    let runtime_dir = state.config.root_dir.join("runtime");
+    let _ = std::fs::remove_dir_all(&data_dir);
+    let _ = std::fs::remove_dir_all(&runtime_dir);
+    std::fs::create_dir_all(&data_dir).map_err(|e| ApiError { status: StatusCode::INTERNAL_SERVER_ERROR, message: format!("failed to recreate data dir: {e}") })?;
+    std::fs::create_dir_all(&runtime_dir).map_err(|e| ApiError { status: StatusCode::INTERNAL_SERVER_ERROR, message: format!("failed to recreate runtime dir: {e}") })?;
+    let home = env::var("HOME").unwrap_or_default();
+    for composer_path in [".composer/cache/repo", ".cache/composer/repo"] {
+        let full = PathBuf::from(&home).join(composer_path);
+        if full.exists() { let _ = std::fs::remove_dir_all(full); }
+    }
+    init_databases(&state.config).map_err(|e| ApiError { status: StatusCode::INTERNAL_SERVER_ERROR, message: format!("reconfigure failed: {e}") })?;
+    ensure_apk_artifacts(&state.config).map_err(|e| ApiError { status: StatusCode::INTERNAL_SERVER_ERROR, message: format!("apk generation failed: {e}") })?;
+    Ok(Json(json!({"success": true, "message": "Ambiente local e cache Composer resetados. Reconfiguração 24.8 aplicada.", "checked_at": now_sql()})))
+}
+
+async fn admin_server_start(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<Json<Value>> {
+    let _ctx = require_admin(&headers, &state)?;
+    let conn = open_conn(&state)?;
+    conn.execute("UPDATE runtime_control SET server_enabled=1, updated_at=datetime('now') WHERE id=1", [])?;
+    Ok(Json(json!({"server_enabled": true, "updated_at": now_sql()})))
+}
+
+async fn admin_server_stop(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<Json<Value>> {
+    let _ctx = require_admin(&headers, &state)?;
+    let conn = open_conn(&state)?;
+    conn.execute("UPDATE runtime_control SET server_enabled=0, updated_at=datetime('now') WHERE id=1", [])?;
+    Ok(Json(json!({"server_enabled": false, "updated_at": now_sql()})))
+}
+
+fn toggle_rows(conn: &Connection, table: &str, codes: &[String], enabled: bool) -> ApiResult<usize> {
+    let val = if enabled { 1 } else { 0 };
+    let mut count = 0;
+    for code in codes {
+        count += conn.execute(&format!("UPDATE {table} SET enabled=?1 WHERE code=?2"), params![val, code])?;
+    }
+    Ok(count)
+}
+
+async fn admin_modules_activate_all(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<Json<Value>> {
+    let _ctx = require_admin(&headers, &state)?;
+    let conn = open_conn(&state)?;
+    let changed = conn.execute("UPDATE system_module SET enabled=1", [])?;
+    Ok(Json(json!({"scope":"modules","mode":"all","enabled": true, "changed": changed})))
+}
+
+async fn admin_modules_activate_partial(State(state): State<AppState>, headers: HeaderMap, Json(input): Json<PartialToggleInput>) -> ApiResult<Json<Value>> {
+    let _ctx = require_admin(&headers, &state)?;
+    let conn = open_conn(&state)?;
+    let enabled = input.enabled.unwrap_or(true);
+    let changed = toggle_rows(&conn, "system_module", &input.codes, enabled)?;
+    Ok(Json(json!({"scope":"modules","mode":"partial","enabled": enabled, "codes": input.codes, "changed": changed})))
+}
+
+async fn admin_services_activate_all(State(state): State<AppState>, headers: HeaderMap) -> ApiResult<Json<Value>> {
+    let _ctx = require_admin(&headers, &state)?;
+    let conn = open_conn(&state)?;
+    let changed = conn.execute("UPDATE service_catalog SET enabled=1", [])?;
+    Ok(Json(json!({"scope":"services","mode":"all","enabled": true, "changed": changed})))
+}
+
+async fn admin_services_activate_partial(State(state): State<AppState>, headers: HeaderMap, Json(input): Json<PartialToggleInput>) -> ApiResult<Json<Value>> {
+    let _ctx = require_admin(&headers, &state)?;
+    let conn = open_conn(&state)?;
+    let enabled = input.enabled.unwrap_or(true);
+    let changed = toggle_rows(&conn, "service_catalog", &input.codes, enabled)?;
+    Ok(Json(json!({"scope":"services","mode":"partial","enabled": enabled, "codes": input.codes, "changed": changed})))
 }

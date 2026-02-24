@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Manual Admin NEXORA</title>
 <style>body{font-family:Arial,sans-serif;margin:36px;color:#111c30;line-height:1.52}h1,h2{color:#07357f}code{background:#eef3ff;padding:2px 6px;border-radius:4px}</style></head><body>
-<h1>Manual do Sistema ADMIN - NEXORA v24.7</h1>
+<h1>Manual do Sistema ADMIN - NEXORA v24.8</h1>
 <section><h2>1. Objetivo</h2><p>Este manual explica como um administrador opera todos os modulos do NEXORA de forma simples e segura.</p></section>
 <section><h2>2. Acesso administrador</h2><p>URL: <code>http://127.0.0.1:8080</code><br>Usuario: <code>admin@nexora.local</code><br>Senha: <code>admin247</code></p></section>
 <section><h2>3. Visao do painel</h2><ul><li>Open Requests: quantidade de solicitacoes abertas.</li><li>Notificacoes: alertas pendentes de leitura.</li><li>Total Faturado: valor consolidado de cobrancas.</li><li>Regiao de Escrita: regiao ativa para transacoes.</li></ul></section>
 <section><h2>4. Modulos administrativos</h2><ol><li><b>IAM/Auth:</b> controle de acesso, perfis e sessoes.</li><li><b>Usuarios PF/PJ:</b> cadastro completo de pessoas fisicas e juridicas.</li><li><b>Catalogo:</b> ativacao e versao de servicos.</li><li><b>Workflow:</b> fila operacional, SLA e escalonamento.</li><li><b>Notificacoes:</b> eventos por prioridade e ack.</li><li><b>Billing:</b> invoices e acompanhamento financeiro.</li><li><b>Analytics:</b> indicadores operacionais e financeiros.</li><li><b>Configuracao Tenant:</b> locale, moeda, timezone e roteamento regional.</li></ol></section>
-<section><h2>5. Failover regional</h2><p>Somente ADMIN pode simular failover via endpoint <code>/api/v24.7/platform/failover/simulate</code>. Sempre registre janela de teste e resultado.</p></section>
+<section><h2>5. Failover regional</h2><p>Somente ADMIN pode simular failover via endpoint <code>/api/v24.8/platform/failover/simulate</code>. Sempre registre janela de teste e resultado.</p></section>
 <section><h2>6. Acesso remoto para homologacao</h2><ol><li><code>.\scripts\publish-remote.ps1</code> para abrir link.</li><li><code>.\scripts\create-remote-tester.ps1</code> para criar conta temporaria.</li><li>Encerrar com <code>revoke-remote-tester</code> e <code>unpublish-remote</code>.</li></ol></section>
 <section><h2>7. Seguranca e compliance</h2><ul><li>Use sempre contas por perfil (nao compartilhe admin).</li><li>Revogue acessos temporarios apos testes.</li><li>Mantenha auditoria e consentimentos atualizados.</li><li>Nao aplique proxy global no sistema operacional.</li></ul></section>
 <section><h2>8. Rotina recomendada diaria</h2><ol><li>Executar <code>healthcheck</code>.</li><li>Conferir metricas e notificacoes criticas.</li><li>Revisar fila de solicitacoes e SLA.</li><li>Validar replicacao e status regional.</li></ol></section>
