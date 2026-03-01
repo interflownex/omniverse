@@ -1,0 +1,158 @@
+version: "3.9"
+
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: nexora-nginx
+    restart: unless-stopped
+    mem_limit: 256m
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infra/nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - nexora-me
+      - nexora-pay
+      - open-finance
+    networks:
+      - nexora-net
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: nexora-postgres
+    restart: unless-stopped
+    mem_limit: 1536m
+    environment:
+      POSTGRES_DB: nexora_pay
+      POSTGRES_USER: nexora
+      POSTGRES_PASSWORD: nexora123
+    command:
+      - postgres
+      - -c
+      - max_connections=300
+      - -c
+      - shared_buffers=256MB
+      - -c
+      - work_mem=4MB
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nexora -d nexora_pay"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - nexora-net
+
+  mongodb:
+    image: mongo:7-jammy
+    container_name: nexora-mongodb
+    restart: unless-stopped
+    mem_limit: 1024m
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: nexora
+      MONGO_INITDB_ROOT_PASSWORD: nexora123
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' localhost:27017/test -u nexora -p nexora123 | grep 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+    networks:
+      - nexora-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: nexora-redis
+    restart: unless-stopped
+    mem_limit: 512m
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    networks:
+      - nexora-net
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: nexora-rabbitmq
+    restart: unless-stopped
+    mem_limit: 768m
+    environment:
+      RABBITMQ_DEFAULT_USER: nexora
+      RABBITMQ_DEFAULT_PASS: nexora123
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - nexora-net
+
+  nexora-me:
+    build:
+      context: ./services/nexora-me
+    container_name: nexora-me
+    restart: unless-stopped
+    mem_limit: 250m
+    environment:
+      PORT: 8081
+      JWT_SECRET: super-secret-change-me
+      JWT_TTL_MINUTES: 30
+      LIVENESS_THRESHOLD: "0.85"
+    ports:
+      - "8081:8081"
+    networks:
+      - nexora-net
+
+  nexora-pay:
+    build:
+      context: ./services/nexora-pay
+    container_name: nexora-pay
+    restart: unless-stopped
+    mem_limit: 250m
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 8082
+      POSTGRES_DSN: postgres://nexora:nexora123@postgres:5432/nexora_pay?sslmode=disable
+    ports:
+      - "8082:8082"
+    networks:
+      - nexora-net
+
+  open-finance:
+    build:
+      context: ./services/open-finance
+    container_name: open-finance
+    restart: unless-stopped
+    mem_limit: 250m
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      PORT: 8083
+      MONGODB_URI: mongodb://nexora:nexora123@mongodb:27017
+      OPEN_FINANCE_DB: nexora_open_finance
+    ports:
+      - "8083:8083"
+    networks:
+      - nexora-net
+
+networks:
+  nexora-net:
+    name: nexora-net
+    driver: bridge
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  redis_data:
+  rabbitmq_data:
