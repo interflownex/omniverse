@@ -54,6 +54,11 @@ ensure_docker_network() {
     exit 1
   fi
 
+  if ! docker info >/dev/null 2>&1; then
+    echo "[setup_master] ERRO: Docker daemon não está disponível. Inicie o Docker Desktop/Engine e tente novamente."
+    exit 1
+  fi
+
   if ! docker network inspect nexora-net >/dev/null 2>&1; then
     docker network create nexora-net >/dev/null
     echo "[setup_master] Rede Docker nexora-net criada."
