@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"math"
 	"math/big"
 	"net/http"
 	"os"
@@ -503,7 +502,7 @@ func formatScaled(value int64, scale int64, decimals int) string {
 	sign := ""
 	if value < 0 {
 		sign = "-"
-		value = int64(math.Abs(float64(value)))
+		value = -value
 	}
 	whole := value / scale
 	frac := value % scale

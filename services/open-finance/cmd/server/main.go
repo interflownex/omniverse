@@ -115,6 +115,10 @@ func (s *server) handleConsents(w http.ResponseWriter, r *http.Request) {
 	}
 
 	normalizedBanks := normalizeBanks(req.Banks)
+	if len(normalizedBanks) == 0 {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "banks has no valid values"})
+		return
+	}
 	doc := bson.M{
 		"user_id":    req.UserID,
 		"banks":      normalizedBanks,
