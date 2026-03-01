@@ -1,5 +1,7 @@
 {
   "recommendations": [
+    "openai.chatgpt",
+    "github.codespaces",
     "ms-vscode-remote.remote-containers",
     "ms-azuretools.vscode-docker",
     "dbaeumer.vscode-eslint",
@@ -9,5 +11,8 @@
     "redhat.vscode-yaml",
     "ms-playwright.playwright",
     "rust-lang.rust-analyzer"
+  ],
+  "unwantedRecommendations": [
+    "github.copilot-chat"
   ]
 }

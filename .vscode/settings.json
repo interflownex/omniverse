@@ -3,6 +3,9 @@
   "editor.formatOnSave": true,
   "terminal.integrated.defaultProfile.windows": "PowerShell",
   "rust-analyzer.check.command": "clippy",
+  "chatgpt.followUpQueueMode": "queue",
+  "chatgpt.composerEnterBehavior": "cmdIfMultiline",
+  "chatgpt.runCodexInWindowsSubsystemForLinux": true,
   "yaml.schemas": {
     "kubernetes": "infra/k8s/**/*.yaml",
   },
