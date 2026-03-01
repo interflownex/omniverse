@@ -7,4 +7,5 @@
     "kubernetes": "infra/k8s/**/*.yaml",
   },
   "github.copilot.nextEditSuggestions.enabled": false,
+  "chatgpt.openOnStartup": true,
 }
