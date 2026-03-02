@@ -14,6 +14,21 @@ services:
       - nexora-me
       - nexora-pay
       - open-finance
+      - nexora-social
+      - nexora-media
+      - nexora-chat
+      - nexora-stock
+      - nexora-place
+      - nexora-move
+      - nexora-food
+      - nexora-business
+      - nexora-plug
+      - nexora-up
+      - document-engine
+      - nexora-life
+      - nexora-trainer
+      - nexora-school-job
+      - persona-burnout
     networks:
       - nexora-net
 
@@ -93,6 +108,41 @@ services:
     networks:
       - nexora-net
 
+  minio:
+    image: minio/minio:latest
+    container_name: nexora-minio
+    restart: unless-stopped
+    mem_limit: 512m
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: nexora
+      MINIO_ROOT_PASSWORD: nexora123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - nexora-net
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: nexora-minio-init
+    restart: "no"
+    mem_limit: 128m
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      until mc alias set local http://minio:9000 nexora nexora123; do sleep 2; done &&
+      mc mb -p local/nexora-videos || true &&
+      mc mb -p local/nexora-docs || true &&
+      mc anonymous set download local/nexora-videos || true &&
+      mc anonymous set download local/nexora-docs || true
+      "
+    networks:
+      - nexora-net
+
   nexora-me:
     build:
       context: ./services/nexora-me
@@ -144,6 +194,383 @@ services:
     networks:
       - nexora-net
 
+  nexora-social:
+    build:
+      context: ./services/nexora-social
+    container_name: nexora-social
+    restart: unless-stopped
+    mem_limit: 256m
+    depends_on:
+      - minio
+      - minio-init
+    environment:
+      PORT: 8084
+      MINIO_PUBLIC_BASE_URL: http://minio:9000
+      MINIO_BUCKET: nexora-videos
+      SOCIAL_INGEST_TOKEN: social-ingest-token
+      SOCIAL_FEED_SEED_SIZE: 120
+    ports:
+      - "8084:8084"
+    networks:
+      - nexora-net
+
+  nexora-media:
+    build:
+      context: ./services/nexora-media
+    container_name: nexora-media
+    restart: unless-stopped
+    mem_limit: 384m
+    depends_on:
+      - minio
+      - minio-init
+      - nexora-social
+    environment:
+      PORT: 8085
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_REGION: us-east-1
+      MINIO_ACCESS_KEY: nexora
+      MINIO_SECRET_KEY: nexora123
+      MINIO_BUCKET: nexora-videos
+      MINIO_PUBLIC_BASE_URL: http://minio:9000
+      SOCIAL_API_BASE: http://nexora-social:8084
+      SOCIAL_INGEST_TOKEN: social-ingest-token
+      MEDIA_DATA_FILE: /data/media-store.json
+      MAX_UPLOAD_MB: 250
+    volumes:
+      - media_data:/data
+    ports:
+      - "8085:8085"
+    networks:
+      - nexora-net
+
+  nexora-chat:
+    build:
+      context: ./services/nexora-chat
+    container_name: nexora-chat
+    restart: unless-stopped
+    mem_limit: 256m
+    environment:
+      PORT: 8086
+      CHAT_HISTORY_LIMIT: 600
+      CHAT_HISTORY_QUERY_LIMIT: 50
+      CHAT_SHIELD_TOKEN: persona-ai-token
+    ports:
+      - "8086:8086"
+    networks:
+      - nexora-net
+
+  nexora-stock:
+    build:
+      context: ./services/nexora-stock
+    container_name: nexora-stock
+    restart: unless-stopped
+    mem_limit: 512m
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nexora-pay:
+        condition: service_started
+    environment:
+      PORT: 8087
+      POSTGRES_DSN: postgres://nexora:nexora123@postgres:5432/nexora_pay?sslmode=disable
+      NEXORA_PAY_BASE_URL: http://nexora-pay:8082
+      NEXORA_STOCK_PLATFORM_USER: nexora-stock
+      NEXORA_UP_BASE_URL: http://nexora-up:8093
+      DOCUMENT_ENGINE_BASE_URL: http://document-engine:8094
+      DOCUMENT_ENGINE_TOKEN: doc-engine-token
+      DEFAULT_CURRENCY: BRL
+      AMAZON_API_BASE_URL: https://api.amazon.com
+      ALIBABA_API_BASE_URL: https://openapi.alibaba.com
+      CJ_API_BASE_URL: https://developers.cjdropshipping.com
+      ALIEXPRESS_API_BASE_URL: https://api-sg.aliexpress.com
+      MERCADOLIVRE_API_BASE_URL: https://api.mercadolibre.com
+      SHOPEE_API_BASE_URL: https://partner.shopee.com
+      CAINIAO_API_BASE_URL: https://global.cainiao.com
+      TRACK17_API_BASE_URL: https://api.17track.net
+      CORREIOS_API_BASE_URL: https://api.correios.com.br
+      LOGGI_API_BASE_URL: https://api.loggi.com
+    ports:
+      - "8087:8087"
+    networks:
+      - nexora-net
+
+  nexora-place:
+    build:
+      context: ./services/nexora-place
+    container_name: nexora-place
+    restart: unless-stopped
+    mem_limit: 320m
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nexora-pay:
+        condition: service_started
+    environment:
+      PORT: 8088
+      POSTGRES_DSN: postgres://nexora:nexora123@postgres:5432/nexora_pay?sslmode=disable
+      NEXORA_PAY_BASE_URL: http://nexora-pay:8082
+      NEXORA_PLACE_PLATFORM_USER: nexora-place
+      NEXORA_UP_BASE_URL: http://nexora-up:8093
+      DOCUMENT_ENGINE_BASE_URL: http://document-engine:8094
+      DOCUMENT_ENGINE_TOKEN: doc-engine-token
+      NEXORA_PLACE_FEE_PCT: 12
+    ports:
+      - "8088:8088"
+    networks:
+      - nexora-net
+
+  nexora-move:
+    build:
+      context: ./services/nexora-move
+    container_name: nexora-move
+    restart: unless-stopped
+    mem_limit: 320m
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nexora-pay:
+        condition: service_started
+    environment:
+      PORT: 8089
+      POSTGRES_DSN: postgres://nexora:nexora123@postgres:5432/nexora_pay?sslmode=disable
+      NEXORA_PAY_BASE_URL: http://nexora-pay:8082
+      NEXORA_MOVE_PLATFORM_USER: nexora-move
+      DOCUMENT_ENGINE_BASE_URL: http://document-engine:8094
+      DOCUMENT_ENGINE_TOKEN: doc-engine-token
+    ports:
+      - "8089:8089"
+    networks:
+      - nexora-net
+
+  nexora-food:
+    build:
+      context: ./services/nexora-food
+    container_name: nexora-food
+    restart: unless-stopped
+    mem_limit: 320m
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nexora-pay:
+        condition: service_started
+    environment:
+      PORT: 8090
+      POSTGRES_DSN: postgres://nexora:nexora123@postgres:5432/nexora_pay?sslmode=disable
+      NEXORA_PAY_BASE_URL: http://nexora-pay:8082
+      NEXORA_FOOD_PLATFORM_USER: nexora-food
+      DOCUMENT_ENGINE_BASE_URL: http://document-engine:8094
+      DOCUMENT_ENGINE_TOKEN: doc-engine-token
+    ports:
+      - "8090:8090"
+    networks:
+      - nexora-net
+
+  nexora-business:
+    build:
+      context: ./services/nexora-business
+    container_name: nexora-business
+    restart: unless-stopped
+    mem_limit: 320m
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nexora-pay:
+        condition: service_started
+      nexora-place:
+        condition: service_started
+      document-engine:
+        condition: service_started
+    environment:
+      PORT: 8091
+      POSTGRES_DSN: postgres://nexora:nexora123@postgres:5432/nexora_pay?sslmode=disable
+      NEXORA_PAY_BASE_URL: http://nexora-pay:8082
+      NEXORA_PLACE_BASE_URL: http://nexora-place:8088
+      DOCUMENT_ENGINE_BASE_URL: http://document-engine:8094
+      DOCUMENT_ENGINE_TOKEN: doc-engine-token
+      BUSINESS_SHIELD_TOKEN: persona-ai-token
+    ports:
+      - "8091:8091"
+    networks:
+      - nexora-net
+
+  nexora-plug:
+    build:
+      context: ./services/nexora-plug
+    container_name: nexora-plug
+    restart: unless-stopped
+    mem_limit: 320m
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nexora-pay:
+        condition: service_started
+      document-engine:
+        condition: service_started
+    environment:
+      PORT: 8092
+      POSTGRES_DSN: postgres://nexora:nexora123@postgres:5432/nexora_pay?sslmode=disable
+      NEXORA_PAY_BASE_URL: http://nexora-pay:8082
+      NEXORA_PLUG_PLATFORM_USER: nexora-plug
+      DOCUMENT_ENGINE_BASE_URL: http://document-engine:8094
+      DOCUMENT_ENGINE_TOKEN: doc-engine-token
+    ports:
+      - "8092:8092"
+    networks:
+      - nexora-net
+
+  nexora-up:
+    build:
+      context: ./services/nexora-up
+    container_name: nexora-up
+    restart: unless-stopped
+    mem_limit: 256m
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nexora-pay:
+        condition: service_started
+    environment:
+      PORT: 8093
+      POSTGRES_DSN: postgres://nexora:nexora123@postgres:5432/nexora_pay?sslmode=disable
+      NEXORA_PAY_BASE_URL: http://nexora-pay:8082
+      NEXORA_UP_SOURCE_STOCK_USER: nexora-stock
+      NEXORA_UP_SOURCE_PLACE_USER: nexora-place
+    ports:
+      - "8093:8093"
+    networks:
+      - nexora-net
+
+  document-engine:
+    build:
+      context: ./services/document-engine
+    container_name: document-engine
+    restart: unless-stopped
+    mem_limit: 384m
+    depends_on:
+      rabbitmq:
+        condition: service_started
+      minio:
+        condition: service_started
+      minio-init:
+        condition: service_started
+    environment:
+      PORT: 8094
+      RABBITMQ_URL: amqp://nexora:nexora123@rabbitmq:5672/
+      RABBITMQ_QUEUE: nexora.purchase.receipts
+      DOCUMENT_ENGINE_TOKEN: doc-engine-token
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_REGION: us-east-1
+      MINIO_ACCESS_KEY: nexora
+      MINIO_SECRET_KEY: nexora123
+      MINIO_DOCS_BUCKET: nexora-docs
+      MINIO_PUBLIC_BASE_URL: http://minio:9000
+      DOCUMENT_STORE_FILE: /data/document-store.json
+    volumes:
+      - document_data:/data
+    ports:
+      - "8094:8094"
+    networks:
+      - nexora-net
+
+
+  nexora-life:
+    build:
+      context: ./services/nexora-life
+    container_name: nexora-life
+    restart: unless-stopped
+    mem_limit: 384m
+    depends_on:
+      postgres:
+        condition: service_healthy
+      persona-burnout:
+        condition: service_started
+    environment:
+      PORT: 8095
+      POSTGRES_DSN: postgres://nexora:nexora123@postgres:5432/nexora_pay?sslmode=disable
+      NEXORA_PERSONA_BASE_URL: http://persona-burnout:8098
+      NEXORA_PERSONA_TOKEN: persona-ai-token
+    ports:
+      - "8095:8095"
+    networks:
+      - nexora-net
+
+  nexora-trainer:
+    build:
+      context: ./services/nexora-trainer
+    container_name: nexora-trainer
+    restart: unless-stopped
+    mem_limit: 320m
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nexora-life:
+        condition: service_started
+    environment:
+      PORT: 8096
+      POSTGRES_DSN: postgres://nexora:nexora123@postgres:5432/nexora_pay?sslmode=disable
+      NEXORA_LIFE_BASE_URL: http://nexora-life:8095
+    ports:
+      - "8096:8096"
+    networks:
+      - nexora-net
+
+  nexora-school-job:
+    build:
+      context: ./services/nexora-school-job
+    container_name: nexora-school-job
+    restart: unless-stopped
+    mem_limit: 384m
+    depends_on:
+      postgres:
+        condition: service_healthy
+      document-engine:
+        condition: service_started
+    environment:
+      PORT: 8097
+      POSTGRES_DSN: postgres://nexora:nexora123@postgres:5432/nexora_pay?sslmode=disable
+      DOCUMENT_ENGINE_BASE_URL: http://document-engine:8094
+      DOCUMENT_ENGINE_TOKEN: doc-engine-token
+    ports:
+      - "8097:8097"
+    networks:
+      - nexora-net
+
+  persona-burnout:
+    build:
+      context: ./services/persona-burnout
+    container_name: persona-burnout
+    restart: unless-stopped
+    mem_limit: 1024m
+    depends_on:
+      nexora-chat:
+        condition: service_started
+      nexora-business:
+        condition: service_started
+      nexora-stock:
+        condition: service_started
+      nexora-social:
+        condition: service_started
+    environment:
+      PORT: 8098
+      NEXORA_PERSONA_TOKEN: persona-ai-token
+      NEXORA_CHAT_BASE_URL: http://nexora-chat:8086
+      NEXORA_CHAT_SHIELD_TOKEN: persona-ai-token
+      NEXORA_BUSINESS_BASE_URL: http://nexora-business:8091
+      NEXORA_BUSINESS_SHIELD_TOKEN: persona-ai-token
+      NEXORA_STOCK_BASE_URL: http://nexora-stock:8087
+      NEXORA_SOCIAL_BASE_URL: http://nexora-social:8084
+      SOCIAL_INGEST_TOKEN: social-ingest-token
+      PERSONA_STATE_FILE: /data/persona-state.json
+      PERSONA_TIMEZONE: America/Sao_Paulo
+      STRESS_BPM_THRESHOLD: 110
+      STRESS_SCORE_THRESHOLD: 0.75
+      MAX_SOCIAL_PUSH: 3
+    volumes:
+      - persona_data:/data
+    ports:
+      - "8098:8098"
+    networks:
+      - nexora-net
 networks:
   nexora-net:
     name: nexora-net
@@ -154,3 +581,7 @@ volumes:
   mongodb_data:
   redis_data:
   rabbitmq_data:
+  minio_data:
+  media_data:
+  document_data:
+  persona_data:

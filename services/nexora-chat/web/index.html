@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEXORA CHAT - Dual Persona</title>
+    <style>
+      :root {
+        --bg: #0b1220;
+        --panel: #121826;
+        --line: #2b3345;
+        --text: #e6edf7;
+        --accent: #22d3ee;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Roboto, Arial, sans-serif;
+        color: var(--text);
+        min-height: 100vh;
+        background: radial-gradient(circle at top right, #1f2937, #020617 70%);
+      }
+      .wrap {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .panel {
+        background: color-mix(in srgb, var(--panel) 88%, black);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px;
+        margin-bottom: 14px;
+      }
+      .row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 10px;
+      }
+      input, button {
+        width: 100%;
+        border-radius: 9px;
+        border: 1px solid var(--line);
+        background: #0f172a;
+        color: var(--text);
+        padding: 10px;
+      }
+      button {
+        cursor: pointer;
+        font-weight: 700;
+        background: linear-gradient(90deg, #0284c7, #22d3ee);
+        color: #02121a;
+      }
+      #badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        font-size: 13px;
+      }
+      #chat {
+        min-height: 320px;
+        max-height: 420px;
+        overflow-y: auto;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: #020817;
+        padding: 12px;
+      }
+      .msg {
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #2a3448;
+        background: #0b1326;
+      }
+      .meta {
+        opacity: 0.8;
+        font-size: 12px;
+        margin-bottom: 4px;
+      }
+      .hint { opacity: 0.75; font-size: 13px; }
+      .swipe {
+        margin-top: 10px;
+        border-radius: 10px;
+        border: 1px dashed #385074;
+        padding: 10px;
+        text-align: center;
+        user-select: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="panel">
+        <h1>NEXORA CHAT - Dual Persona</h1>
+        <p class="hint">Swipe left/right in the chat zone to toggle between personal and professional persona.</p>
+        <div class="row">
+          <input id="userId" placeholder="user_id" value="user-01" />
+          <input id="peerId" placeholder="peer_id" value="user-02" />
+          <button id="connectBtn">Connect</button>
+        </div>
+        <p>Current persona: <span id="badge">personal</span></p>
+      </div>
+
+      <div class="panel">
+        <div id="chat"></div>
+        <div class="swipe" id="swipeArea">Swipe here to switch persona</div>
+        <div class="row" style="margin-top: 10px;">
+          <input id="message" placeholder="Type a message..." />
+          <button id="sendBtn">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const chat = document.getElementById('chat');
+      const badge = document.getElementById('badge');
+      const userIdInput = document.getElementById('userId');
+      const peerIdInput = document.getElementById('peerId');
+      const messageInput = document.getElementById('message');
+      const swipeArea = document.getElementById('swipeArea');
+      const state = {
+        ws: null,
+        persona: 'personal',
+        swipeX: null
+      };
+
+      function addMessage(meta, text) {
+        const node = document.createElement('div');
+        node.className = 'msg';
+        node.innerHTML = `<div class="meta">${meta}</div><div>${text}</div>`;
+        chat.appendChild(node);
+        chat.scrollTop = chat.scrollHeight;
+      }
+
+      function wsURL() {
+        const scheme = location.protocol === 'https:' ? 'wss' : 'ws';
+        return `${scheme}://${location.host}/ws?user_id=${encodeURIComponent(userIdInput.value.trim())}&persona=${encodeURIComponent(state.persona)}`;
+      }
+
+      function setPersona(p) {
+        state.persona = p;
+        badge.textContent = p;
+        if (state.ws && state.ws.readyState === WebSocket.OPEN) {
+          state.ws.send(JSON.stringify({ type: 'switch_persona', persona: p }));
+        }
+      }
+
+      function togglePersona() {
+        setPersona(state.persona === 'personal' ? 'professional' : 'personal');
+      }
+
+      function connect() {
+        if (!userIdInput.value.trim()) {
+          addMessage('system', 'user_id is required');
+          return;
+        }
+        if (state.ws) {
+          state.ws.close();
+        }
+
+        state.ws = new WebSocket(wsURL());
+        state.ws.onopen = () => addMessage('system', `connected as ${userIdInput.value.trim()} (${state.persona})`);
+        state.ws.onclose = () => addMessage('system', 'connection closed');
+        state.ws.onerror = () => addMessage('system', 'connection error');
+        state.ws.onmessage = (event) => {
+          let payload = {};
+          try { payload = JSON.parse(event.data); } catch { payload = { type: 'raw', data: event.data }; }
+
+          if (payload.type === 'chat_message' && payload.message) {
+            const m = payload.message;
+            addMessage(`${m.persona} | ${m.from_user} -> ${m.to_user}`, m.text);
+            return;
+          }
+
+          if (payload.type === 'persona_switched') {
+            state.persona = payload.persona;
+            badge.textContent = payload.persona;
+            addMessage('system', `persona switched to ${payload.persona}`);
+            return;
+          }
+
+          addMessage(payload.type || 'event', JSON.stringify(payload));
+        };
+      }
+
+      function sendMessage() {
+        const peer = peerIdInput.value.trim();
+        const text = messageInput.value.trim();
+        if (!state.ws || state.ws.readyState !== WebSocket.OPEN) {
+          addMessage('system', 'websocket not connected');
+          return;
+        }
+        if (!peer || !text) {
+          addMessage('system', 'peer_id and message are required');
+          return;
+        }
+        state.ws.send(JSON.stringify({
+          type: 'send_message',
+          to_user_id: peer,
+          text,
+          persona: state.persona
+        }));
+        messageInput.value = '';
+      }
+
+      document.getElementById('connectBtn').onclick = connect;
+      document.getElementById('sendBtn').onclick = sendMessage;
+      messageInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendMessage();
+      });
+
+      swipeArea.addEventListener('pointerdown', (e) => {
+        state.swipeX = e.clientX;
+      });
+      swipeArea.addEventListener('pointerup', (e) => {
+        if (state.swipeX === null) return;
+        const delta = e.clientX - state.swipeX;
+        state.swipeX = null;
+        if (Math.abs(delta) > 60) {
+          togglePersona();
+        }
+      });
+    </script>
+  </body>
+</html>

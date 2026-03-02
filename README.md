@@ -74,3 +74,28 @@ Generated manuals are available at:
 - `docs/manuals/pdf/manual-servidor-local.pdf`
 - `docs/manuals/pdf/manual-admin.pdf`
 - `docs/manuals/pdf/manual-usuario.pdf`
+
+## New media and realtime modules
+
+- `services/nexora-social` (Go): short-video feed with keyset cursor pagination for infinite scroll.
+- `services/nexora-media` (Node.js): creator backend panel, MP4 upload URL generation (MinIO), and monetization controls.
+- `services/nexora-chat` (Go): WebSocket instant messaging with dual persona (`personal` and `professional`) and swipe-toggle web UI.
+- `minio` + `minio-init` in `docker-compose.yml`: MP4 object storage bucket (`nexora-videos`) with rigid RAM limits.
+
+## Block 3 modules (mandatory)
+
+- `services/nexora-stock` (Go): mega dropship engine with mapped REST adapters for Amazon, Alibaba, CJ Dropshipping, AliExpress, MercadoLivre and Shopee.
+  - Suggested products by category.
+  - Automatic import into PostgreSQL with final pricing formula: `cost + freight + 50% Nexora margin`.
+  - Tracking integrations mapped for Cainiao, 17TRACK, Correios and Loggi.
+  - One-click purchase route with automatic split execution in Nexora Pay.
+- `services/nexora-place` (Go): local marketplace for physical inventory (focus Betim/Brazil) with automatic split in Nexora Pay.
+- `services/nexora-move` (Go): urban mobility with fixed fee `10%` and automatic split in Nexora Pay.
+- `services/nexora-food` (Go): food delivery with fixed fee `15%` and automatic split in Nexora Pay.
+
+## Block 4 modules (mandatory)
+
+- `services/nexora-business` (Go): ERP com emissão de notas, sincronização de estoque com `nexora-place` e processamento de folha via `nexora-pay`.
+- `services/nexora-plug` (Go): maquininha cartão + Tap-to-Pay (NFC), cálculo de MDR e antecipação D+0 com liquidação imediata.
+- `services/nexora-up` (Go): motor de afiliados CAC Zero, calculando 5% da margem e repasse imediato para o indicador em compras de Stock/Place.
+- `services/document-engine` (Node.js): fábrica de PDFs consumindo RabbitMQ e salvando comprovantes no MinIO (`nexora-docs`) para todas as compras integradas.
