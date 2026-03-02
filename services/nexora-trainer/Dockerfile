@@ -18,4 +18,5 @@ COPY --from=builder /out/nexora-trainer /usr/local/bin/nexora-trainer
 
 USER app
 
-ENTRYPOINT ["/usr/local/bin/nexora-traine
+ENTRYPOINT ["/usr/local/bin/nexora-trainer"]
+EXPOSE 8096
