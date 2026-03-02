@@ -78,16 +78,16 @@ type TrackingSnapshot struct {
 }
 
 type server struct {
-	db              *sql.DB
-	httpClient      *http.Client
-	suppliers       map[string]SupplierAdapter
-	trackers        map[string]TrackingAdapter
-	payBaseURL      string
-	upBaseURL       string
+	db                  *sql.DB
+	httpClient          *http.Client
+	suppliers           map[string]SupplierAdapter
+	trackers            map[string]TrackingAdapter
+	payBaseURL          string
+	upBaseURL           string
 	documentEngineBase  string
 	documentEngineToken string
-	platformUserID  string
-	defaultCurrency string
+	platformUserID      string
+	defaultCurrency     string
 }
 
 type restSupplierAdapter struct {
@@ -109,9 +109,10 @@ type restTrackingAdapter struct {
 }
 
 type importAutoRequest struct {
-	Source   string `json:"source"`
-	Category string `json:"category"`
-	Limit    int    `json:"limit"`
+	Source              string   `json:"source"`
+	Category            string   `json:"category"`
+	Limit               int      `json:"limit"`
+	SelectedExternalIDs []string `json:"selected_external_ids"`
 }
 
 type oneClickPurchaseRequest struct {
@@ -153,16 +154,16 @@ func main() {
 	httpClient := &http.Client{Timeout: 12 * time.Second}
 
 	s := &server{
-		db:              db,
-		httpClient:      httpClient,
-		suppliers:       buildSupplierAdapters(httpClient),
-		trackers:        buildTrackingAdapters(httpClient),
-		payBaseURL:      payBase,
-		upBaseURL:       upBase,
+		db:                  db,
+		httpClient:          httpClient,
+		suppliers:           buildSupplierAdapters(httpClient),
+		trackers:            buildTrackingAdapters(httpClient),
+		payBaseURL:          payBase,
+		upBaseURL:           upBase,
 		documentEngineBase:  docBase,
 		documentEngineToken: docToken,
-		platformUserID:  platformUser,
-		defaultCurrency: defaultCurrency,
+		platformUserID:      platformUser,
+		defaultCurrency:     defaultCurrency,
 	}
 
 	mux := http.NewServeMux()
@@ -229,13 +230,13 @@ func (a restSupplierAdapter) Name() string {
 
 func (a restSupplierAdapter) Mapping() map[string]any {
 	return map[string]any{
-		"name":         a.name,
-		"base_env":     a.baseEnv,
-		"token_env":    a.tokenEnv,
-		"search_path":  a.searchPath,
-		"default_ccy":  a.defaultCurrency,
-		"mapped":       true,
-		"api_type":     "rest",
+		"name":        a.name,
+		"base_env":    a.baseEnv,
+		"token_env":   a.tokenEnv,
+		"search_path": a.searchPath,
+		"default_ccy": a.defaultCurrency,
+		"mapped":      true,
+		"api_type":    "rest",
 	}
 }
 
@@ -372,12 +373,12 @@ func (a restTrackingAdapter) Carrier() string {
 
 func (a restTrackingAdapter) Mapping() map[string]any {
 	return map[string]any{
-		"carrier":      a.carrier,
-		"base_env":     a.baseEnv,
-		"token_env":    a.tokenEnv,
-		"track_path":   a.trackPath,
-		"mapped":       true,
-		"api_type":     "rest",
+		"carrier":    a.carrier,
+		"base_env":   a.baseEnv,
+		"token_env":  a.tokenEnv,
+		"track_path": a.trackPath,
+		"mapped":     true,
+		"api_type":   "rest",
 	}
 }
 
@@ -574,6 +575,31 @@ func (s *server) handleImportAuto(w http.ResponseWriter, r *http.Request) {
 	if len(suggestions) == 0 {
 		writeJSON(w, http.StatusBadGateway, map[string]any{"error": "no products returned by suppliers", "warnings": warnings})
 		return
+	}
+
+	selected := map[string]struct{}{}
+	for _, extID := range req.SelectedExternalIDs {
+		n := strings.TrimSpace(strings.ToLower(extID))
+		if n != "" {
+			selected[n] = struct{}{}
+		}
+	}
+	if len(selected) > 0 {
+		filtered := make([]SupplierProduct, 0, len(suggestions))
+		for _, item := range suggestions {
+			if _, ok := selected[strings.TrimSpace(strings.ToLower(item.ExternalID))]; ok {
+				filtered = append(filtered, item)
+			}
+		}
+		suggestions = filtered
+		if len(suggestions) == 0 {
+			writeJSON(w, http.StatusBadRequest, map[string]any{
+				"error":    "selected_external_ids did not match any suggested products",
+				"category": req.Category,
+				"source":   chooseSourceLabel(req.Source),
+			})
+			return
+		}
 	}
 
 	imported := make([]ImportedProduct, 0, len(suggestions))
@@ -854,12 +880,12 @@ func (s *server) handleOneClickPurchase(w http.ResponseWriter, r *http.Request) 
 	})
 
 	writeJSON(w, http.StatusOK, map[string]any{
-		"status":   "paid",
-		"order_id": orderID,
-		"video_id": req.VideoID,
+		"status":     "paid",
+		"order_id":   orderID,
+		"video_id":   req.VideoID,
 		"product_id": req.ProductID,
-		"quantity": req.Quantity,
-		"currency": req.Currency,
+		"quantity":   req.Quantity,
+		"currency":   req.Currency,
 		"pricing": map[string]any{
 			"unit_cost":      centsToMoney(unitCost),
 			"unit_freight":   centsToMoney(unitFreight),
