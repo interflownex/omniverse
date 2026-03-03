@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 {
   "files.eol": "\n",
   "editor.formatOnSave": true,
@@ -12,3 +14,4 @@
   "github.copilot.nextEditSuggestions.enabled": false,
   "chatgpt.openOnStartup": true,
 }
+>>>>>>> c02e317aa13216d6aeb87cdd02fd107a7648b589
