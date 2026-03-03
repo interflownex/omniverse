@@ -61,7 +61,17 @@ DO UPDATE SET
   updated_at = NOW();
 
 INSERT INTO wallet_transactions (tx_type, from_user_id, to_user_id, currency, amount_raw, status)
-VALUES ('seed_credit', 'seed-treasury', 'anderson', 'BRL', 10000000, 'completed');
+SELECT 'seed_credit', 'seed-treasury', 'anderson', 'BRL', 10000000, 'completed'
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM wallet_transactions
+  WHERE tx_type = 'seed_credit'
+    AND from_user_id = 'seed-treasury'
+    AND to_user_id = 'anderson'
+    AND currency = 'BRL'
+    AND amount_raw = 10000000
+    AND status = 'completed'
+);
 
 INSERT INTO stock_imported_products (
   product_id,

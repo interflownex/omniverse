@@ -70,7 +70,7 @@ services:
     volumes:
       - mongodb_data:/data/db
     healthcheck:
-      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' localhost:27017/test -u nexora -p nexora123 | grep 1"]
+      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' mongodb://nexora:nexora123@localhost:27017/admin?authSource=admin | grep 1"]
       interval: 15s
       timeout: 10s
       retries: 10
