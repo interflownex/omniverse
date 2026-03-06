@@ -1,4 +1,4 @@
-# Data Dictionary (NEXORA v24.7)
+# Data Dictionary (NEXORA v24.8)
 
 ## Core principles
 - Canonical entity root: `party` for both PF and PJ.

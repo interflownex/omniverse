@@ -1,6 +1,6 @@
 {
   "assistant": "Persona",
-  "bootstrapEndpoint": "/api/v24.7/mobile/bootstrap",
+  "bootstrapEndpoint": "/api/v24.8/mobile/bootstrap",
   "preferredBaseUrl": "https://nexora.interflownex.com",
   "fallbackMode": "auto",
   "autoReconnect": true,

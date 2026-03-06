@@ -1,4 +1,4 @@
-# Entity Link Matrix (NEXORA v24.7)
+# Entity Link Matrix (NEXORA v24.8)
 
 | From | To | Mechanism |
 |---|---|---|

@@ -1,6 +1,6 @@
 # NEXORA Core
 
-Rust + Axum runtime exposing NEXORA API v24.7.
+Rust + Axum runtime exposing NEXORA API v24.8.
 
 ## Build
 

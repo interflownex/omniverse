@@ -1,6 +1,6 @@
 [package]
 name = "nexora-core"
-version = "24.7.0"
+version = "24.8.0"
 edition = "2021"
 
 [dependencies]

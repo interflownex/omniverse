@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NEXORA Admin Console</title>
+  <title>NEXORA Admin Console 24.8</title>
   <link rel="stylesheet" href="/static/styles.css" />
   <style>
     .grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
@@ -18,7 +18,7 @@
 <body>
   <div class="shell">
     <header class="topbar">
-      <div class="brand"><div class="badge">X</div><div><div>NEXORA Admin Console</div><small>Operação local sem PowerShell</small></div></div>
+      <div class="brand"><div class="badge">X</div><div><div>NEXORA Admin Console 24.8</div><small>Operação full-control e provisionamento Android</small></div></div>
       <nav class="nav-links">
         <a href="/">Dashboard</a>
         <a href="/downloads">Downloads</a>
@@ -26,14 +26,19 @@
     </header>
 
     <section class="hero">
-      <h1>Painel de Ativação Local e Roteamento Externo</h1>
-      <p>Ative host externo, gere usuários de teste e execute validações usando apenas botões no navegador.</p>
+      <h1>Painel Mandatório: Ativação total, parcial e acesso externo</h1>
+      <p>Gerencie módulos/serviços, ligue ou desligue servidor lógico, gere link público e execute reconfiguração zero sem confirmação.</p>
     </section>
 
     <section class="grid" style="margin-top:12px;">
       <article class="card">
-        <h3 style="margin-top:0">Login Admin</h3>
-        <label>Email</label>
+        <h3 style="margin-top:0">Login rápido por perfil</h3>
+        <div class="controls">
+          <button class="btn" onclick="quickLogin('admin')">Login Administrador</button>
+          <button class="btn secondary" onclick="quickLogin('user')">Login Usuário</button>
+          <button class="btn secondary" onclick="quickLogin('analyst')">Login Analista</button>
+        </div>
+        <label style="margin-top:8px;display:block">Email</label>
         <input id="email" value="admin@nexora.local" />
         <label style="margin-top:8px;display:block">Senha</label>
         <input id="password" type="password" value="admin247" />
@@ -50,78 +55,80 @@
         <div class="controls">
           <button class="btn" onclick="runAction('publish-remote')">Ativar Host Externo</button>
           <button class="btn secondary" onclick="runAction('unpublish-remote')">Desativar Host Externo</button>
+          <button class="btn" onclick="runAction('server/start')">Ligar Servidor</button>
+          <button class="btn secondary" onclick="runAction('server/stop')">Desligar Servidor</button>
+          <button class="btn" onclick="runAction('modules/activate-all')">Ativar Todos Módulos</button>
+          <button class="btn secondary" onclick="partialToggle('modules')">Ativar Módulos Parcial</button>
+          <button class="btn" onclick="runAction('services/activate-all')">Ativar Todos Serviços</button>
+          <button class="btn secondary" onclick="partialToggle('services')">Ativar Serviços Parcial</button>
           <button class="btn" onclick="runAction('create-tester')">Criar Usuário de Teste</button>
           <button class="btn secondary" onclick="runAction('revoke-tester')">Revogar Usuário de Teste</button>
           <button class="btn" onclick="runAction('healthcheck')">Rodar Healthcheck</button>
           <button class="btn secondary" onclick="runAction('validate-internet')">Validar Internet Host</button>
+          <button class="btn" onclick="runAction('reconfigure-zero')">Reconfigurar Tudo do Zero</button>
         </div>
 
         <h3>Saída da operação</h3>
         <div id="output" class="out">Nenhuma ação executada.</div>
       </article>
     </section>
-
-    <section class="card" style="margin-top:12px;">
-      <h3 style="margin-top:0">Downloads Diretos</h3>
-      <div class="nav-links">
-        <a href="/static/downloads/manual-servidor-local.pdf" target="_blank">Manual Servidor (PDF)</a>
-        <a href="/static/downloads/manual-admin.pdf" target="_blank">Manual Admin (PDF)</a>
-        <a href="/static/downloads/manual-usuario.pdf" target="_blank">Manual Usuário (PDF)</a>
-        <a href="/static/downloads/manual-smartphone.pdf" target="_blank">Manual Smartphone (PDF)</a>
-        <a href="/static/downloads/manuais-nexora.zip" target="_blank">ZIP de Manuais</a>
-        <a href="/static/downloads/nexora-mobile.apk" target="_blank">APK Mobile</a>
-        <a href="/static/downloads/nexora-smartwatch.apk" target="_blank">APK Smartwatch</a>
-      </div>
-      <p class="meta" style="margin-top:8px;">A auto-conexão do app usa o bootstrap <code>/api/v24.7/mobile/bootstrap</code> (Persona habilitada).</p>
-    </section>
   </div>
 
   <script>
     let token = null;
+    const creds = {
+      admin: { email: 'admin@nexora.local', password: 'admin247' },
+      user: { email: 'user@nexora.local', password: 'user247' },
+      analyst: { email: 'analyst@nexora.local', password: 'analyst247' }
+    };
+
+    async function quickLogin(role) {
+      const c = creds[role];
+      document.getElementById('email').value = c.email;
+      document.getElementById('password').value = c.password;
+      await login();
+    }
 
     async function login() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
       try {
-        const r = await fetch('/api/v24.7/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
+        const r = await fetch('/api/v24.8/auth/login', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password })
         });
         const data = await r.json();
         if (!r.ok) throw new Error(data.error || 'Falha de autenticação');
         token = data.access_token;
-        document.getElementById('authState').textContent = `Conectado como ${data.user.email}`;
+        document.getElementById('authState').textContent = `Conectado como ${data.user.email} (${data.user.role_code})`;
         await refreshStatus();
-      } catch (e) {
-        document.getElementById('authState').textContent = `Erro: ${e.message}`;
-      }
+      } catch (e) { document.getElementById('authState').textContent = `Erro: ${e.message}`; }
     }
 
     async function refreshStatus() {
       if (!token) return;
-      const r = await fetch('/api/v24.7/admin/status', { headers: { Authorization: `Bearer ${token}` } });
+      const r = await fetch('/api/v24.8/admin/status', { headers: { Authorization: `Bearer ${token}` } });
       const data = await r.json();
       document.getElementById('statusBox').textContent = JSON.stringify(data, null, 2);
     }
 
-    async function runAction(action) {
-      if (!token) {
-        document.getElementById('output').textContent = 'Faça login admin primeiro.';
-        return;
-      }
+    async function runAction(action, method = 'POST', body = null) {
+      if (!token) return document.getElementById('output').textContent = 'Faça login admin primeiro.';
       document.getElementById('output').textContent = `Executando ${action}...`;
+      const opts = { method, headers: { Authorization: `Bearer ${token}` } };
+      if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
       try {
-        const r = await fetch(`/api/v24.7/admin/${action}`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const r = await fetch(`/api/v24.8/admin/${action}`, opts);
         const data = await r.json();
         document.getElementById('output').textContent = JSON.stringify(data, null, 2);
         await refreshStatus();
-      } catch (e) {
-        document.getElementById('output').textContent = `Erro: ${e.message}`;
-      }
+      } catch (e) { document.getElementById('output').textContent = `Erro: ${e.message}`; }
+    }
+
+    async function partialToggle(scope) {
+      const codesRaw = prompt(`Informe os códigos de ${scope} separados por vírgula:`);
+      if (!codesRaw) return;
+      const codes = codesRaw.split(',').map(v => v.trim()).filter(Boolean);
+      await runAction(`${scope}/activate-partial`, 'POST', { codes, enabled: true });
     }
   </script>
 </body>
