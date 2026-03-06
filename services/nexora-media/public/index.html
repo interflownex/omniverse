@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEXORA MEDIA PANEL</title>
+    <style>
+      :root {
+        --bg: #0f172a;
+        --card: #111827;
+        --line: #334155;
+        --text: #e5e7eb;
+        --accent: #22d3ee;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Roboto, Arial, sans-serif;
+        background: radial-gradient(circle at top, #1e293b, #020617 65%);
+        color: var(--text);
+      }
+      .wrap {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: color-mix(in srgb, var(--card) 86%, black);
+        padding: 16px;
+        margin-bottom: 14px;
+      }
+      h1, h2 { margin: 0 0 12px 0; }
+      .grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+      input, textarea, button {
+        width: 100%;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: #0b1222;
+        color: var(--text);
+        padding: 10px;
+      }
+      button {
+        cursor: pointer;
+        background: linear-gradient(90deg, #0284c7, #22d3ee);
+        color: #001018;
+        font-weight: 700;
+      }
+      pre {
+        margin: 0;
+        white-space: pre-wrap;
+        background: #030712;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px;
+        min-height: 120px;
+      }
+      .meta { opacity: 0.85; font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>NEXORA MIDIA - Creator Backend Panel</h1>
+      <p class="meta">Upload via pre-signed URL (MinIO) and monetization management.</p>
+
+      <section class="card">
+        <h2>1) Generate Upload URL</h2>
+        <div class="grid">
+          <input id="u_creator" placeholder="creator_id" value="creator-01" />
+          <input id="u_title" placeholder="title" value="Meu video curto" />
+          <input id="u_file" placeholder="file_name" value="video.mp4" />
+          <input id="u_size" placeholder="file_size_bytes" value="5242880" />
+        </div>
+        <div style="margin-top: 10px"><button id="btn_upload_url">Generate</button></div>
+      </section>
+
+      <section class="card">
+        <h2>2) Register Video Metadata</h2>
+        <div class="grid">
+          <input id="r_creator" placeholder="creator_id" value="creator-01" />
+          <input id="r_title" placeholder="title" value="Meu video curto" />
+          <input id="r_object" placeholder="object_key" value="creator-01/2026/03/vid-001.mp4" />
+          <input id="r_duration" placeholder="duration_seconds" value="21" />
+          <input id="r_audience" placeholder="audience (all/personal/professional)" value="all" />
+          <input id="r_cpm" placeholder="cpm_usd" value="1.25" />
+        </div>
+        <div style="margin-top: 10px"><button id="btn_register">Register</button></div>
+      </section>
+
+      <section class="card">
+        <h2>3) Update Monetization</h2>
+        <div class="grid">
+          <input id="m_video" placeholder="video_id" />
+          <input id="m_model" placeholder="model" value="ad_cpm" />
+          <input id="m_cpm" placeholder="cpm_usd" value="2.0" />
+          <input id="m_share" placeholder="rev_share_pct" value="70" />
+        </div>
+        <div style="margin-top: 10px"><button id="btn_monetize">Update</button></div>
+      </section>
+
+      <section class="card">
+        <h2>4) List Videos</h2>
+        <div class="grid">
+          <input id="l_creator" placeholder="creator_id (optional)" />
+          <input id="l_cursor" placeholder="cursor (optional)" />
+          <input id="l_limit" placeholder="limit" value="10" />
+        </div>
+        <div style="margin-top: 10px"><button id="btn_list">List</button></div>
+      </section>
+
+      <section class="card">
+        <h2>Output</h2>
+        <pre id="out"></pre>
+      </section>
+    </div>
+
+    <script>
+      const out = document.getElementById('out');
+      const print = (obj) => { out.textContent = typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2); };
+
+      async function req(url, options) {
+        const r = await fetch(url, options);
+        const text = await r.text();
+        try {
+          return JSON.parse(text);
+        } catch {
+          return { status: r.status, body: text };
+        }
+      }
+
+      document.getElementById('btn_upload_url').onclick = async () => {
+        const payload = {
+          creator_id: document.getElementById('u_creator').value,
+          title: document.getElementById('u_title').value,
+          file_name: document.getElementById('u_file').value,
+          file_size_bytes: Number(document.getElementById('u_size').value)
+        };
+        print(await req('/v1/videos/upload-url', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) }));
+      };
+
+      document.getElementById('btn_register').onclick = async () => {
+        const payload = {
+          creator_id: document.getElementById('r_creator').value,
+          title: document.getElementById('r_title').value,
+          object_key: document.getElementById('r_object').value,
+          duration_seconds: Number(document.getElementById('r_duration').value),
+          audience: document.getElementById('r_audience').value,
+          monetization: {
+            enabled: true,
+            model: 'ad_cpm',
+            cpm_usd: Number(document.getElementById('r_cpm').value),
+            rev_share_pct: 62.5
+          }
+        };
+        const resp = await req('/v1/videos/register', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
+        if (resp.video && resp.video.id) {
+          document.getElementById('m_video').value = resp.video.id;
+        }
+        print(resp);
+      };
+
+      document.getElementById('btn_monetize').onclick = async () => {
+        const videoId = document.getElementById('m_video').value;
+        const payload = {
+          enabled: true,
+          model: document.getElementById('m_model').value,
+          cpm_usd: Number(document.getElementById('m_cpm').value),
+          rev_share_pct: Number(document.getElementById('m_share').value)
+        };
+        print(await req(`/v1/videos/${encodeURIComponent(videoId)}/monetization`, { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) }));
+      };
+
+      document.getElementById('btn_list').onclick = async () => {
+        const q = new URLSearchParams();
+        const creator = document.getElementById('l_creator').value.trim();
+        const cursor = document.getElementById('l_cursor').value.trim();
+        const limit = document.getElementById('l_limit').value.trim();
+        if (creator) q.set('creator_id', creator);
+        if (cursor) q.set('cursor', cursor);
+        if (limit) q.set('limit', limit);
+        print(await req(`/v1/videos?${q.toString()}`, { method: 'GET' }));
+      };
+    </script>
+  </body>
+</html>

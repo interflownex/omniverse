@@ -1,9 +1,17 @@
+<<<<<<< HEAD
+=======
 {
   "files.eol": "\n",
   "editor.formatOnSave": true,
   "terminal.integrated.defaultProfile.windows": "PowerShell",
   "rust-analyzer.check.command": "clippy",
+  "chatgpt.followUpQueueMode": "queue",
+  "chatgpt.composerEnterBehavior": "cmdIfMultiline",
+  "chatgpt.runCodexInWindowsSubsystemForLinux": true,
   "yaml.schemas": {
-    "kubernetes": "infra/k8s/**/*.yaml"
-  }
+    "kubernetes": "infra/k8s/**/*.yaml",
+  },
+  "github.copilot.nextEditSuggestions.enabled": false,
+  "chatgpt.openOnStartup": true,
 }
+>>>>>>> c02e317aa13216d6aeb87cdd02fd107a7648b589
